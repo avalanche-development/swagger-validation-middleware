@@ -2,6 +2,8 @@
 
 namespace AvalancheDevelopment\SwaggerValidationMiddleware;
 
+use AvalancheDevelopment\Peel\HttpError;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -26,13 +28,42 @@ class Validation implements LoggerAwareInterface
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next)
     {
+        if (!$request->getAttribute('swagger')) {
+            $this->log('no swagger information found in request, skipping');
+            return $next($request, $response);
+        }
+
         // todo check security
-        // todo check scheme
+
+        $schemes = $request->getAttribute('swagger')['schemes'];
+        if (!$this->checkScheme($request, $schemes)) {
+            throw new HttpError\NotFound('Unallowed scheme in request');
+        }
+
         // todo check header
         // todo check parameters
         $result = $next($request, $response);
         // todo check header
         // todo check response body
         return $result;
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @param array $schemes
+     * @return boolean
+     */
+    public function checkScheme(RequestInterface $request, array $schemes)
+    {
+        $requestScheme = $request->getUri()->getScheme();
+        return in_array($requestScheme, $schemes);
+    }
+
+    /**
+     * @param string $message
+     */
+    protected function log($message)
+    {
+        $this->logger->debug("swagger-validation-middleware: {$message}");
     }
 }
