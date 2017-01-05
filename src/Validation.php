@@ -33,7 +33,10 @@ class Validation implements LoggerAwareInterface
             return $next($request, $response);
         }
 
-        // todo check security
+        $security = $request->getAttribute('swagger')['security'];
+        if (!$this->checkSecurity($request, $security)) {
+            throw new HttpError\Unauthorized('Unacceptable security passed in request');
+        }
 
         $schemes = $request->getAttribute('swagger')['schemes'];
         if (!$this->checkScheme($request, $schemes)) {
@@ -46,6 +49,16 @@ class Validation implements LoggerAwareInterface
         // todo check header
         // todo check response body
         return $result;
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @param array $security
+     * @return boolean
+     */
+    public function checkSecurity(RequestInterface $request, array $security)
+    {
+        return true;
     }
 
     /**
