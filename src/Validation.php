@@ -76,7 +76,7 @@ class Validation implements LoggerAwareInterface
      * @param array $schemes
      * @return boolean
      */
-    public function checkScheme(RequestInterface $request, array $schemes)
+    protected function checkScheme(RequestInterface $request, array $schemes)
     {
         $requestScheme = $request->getUri()->getScheme();
         return in_array($requestScheme, $schemes);

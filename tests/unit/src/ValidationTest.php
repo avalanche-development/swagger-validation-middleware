@@ -6,6 +6,7 @@ use PHPUnit_Framework_TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -265,6 +266,66 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
 
         $this->assertSame($mockCallStackResponse, $result);
+    }
+
+    public function testCheckSchemeReturnsTrueIfRequestSchemeIsAllowed()
+    {
+        $mockUri = $this->createMock(UriInterface::class);
+        $mockUri->expects($this->once())
+            ->method('getScheme')
+            ->willReturn('http');
+        $mockRequest = $this->createMock(ServerRequestInterface::class);
+        $mockRequest->expects($this->once())
+            ->method('getUri')
+            ->willReturn($mockUri);
+
+        $mockSchemes = [ 'http' ];
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedCheckScheme = $reflectedValidation->getMethod('checkScheme');
+        $reflectedCheckScheme->setAccessible(true);
+
+        $validation = $this->getMockBuilder(Validation::class)
+            ->disableOriginalConstructor()
+            ->setMethods(null)
+            ->getMock();
+
+        $result = $reflectedCheckScheme->invokeArgs($validation, [
+            $mockRequest,
+            $mockSchemes,
+        ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCheckSchemeReturnsFalseIfRequestSchemeNotAllowed()
+    {
+        $mockUri = $this->createMock(UriInterface::class);
+        $mockUri->expects($this->once())
+            ->method('getScheme')
+            ->willReturn('http');
+        $mockRequest = $this->createMock(ServerRequestInterface::class);
+        $mockRequest->expects($this->once())
+            ->method('getUri')
+            ->willReturn($mockUri);
+
+        $mockSchemes = [ 'https' ];
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedCheckScheme = $reflectedValidation->getMethod('checkScheme');
+        $reflectedCheckScheme->setAccessible(true);
+
+        $validation = $this->getMockBuilder(Validation::class)
+            ->disableOriginalConstructor()
+            ->setMethods(null)
+            ->getMock();
+
+        $result = $reflectedCheckScheme->invokeArgs($validation, [
+            $mockRequest,
+            $mockSchemes,
+        ]);
+
+        $this->assertFalse($result);
     }
 
     public function testLog()
