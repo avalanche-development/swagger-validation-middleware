@@ -58,7 +58,17 @@ class Validation implements LoggerAwareInterface
      */
     public function checkSecurity(RequestInterface $request, array $security)
     {
-        return true;
+        $metSecurity = array_filter($security, function ($scheme) use ($request) {
+            if ($scheme['type'] === 'basic') {
+                $authHeader = $request->getHeader('Authorization');
+                $authHeader = explode(' ', $authHeader);
+                return ($authHeader[0] === 'Basic' && preg_match('/^[a-z0-9]+$/i', $authHeader[1]) === 1);
+            }
+            // todo oauth
+            return false;
+        });
+
+        return count($metSecurity) > 0;
     }
 
     /**
