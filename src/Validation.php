@@ -33,8 +33,9 @@ class Validation implements LoggerAwareInterface
             return $next($request, $response);
         }
 
+        $securityValidation = new SecurityValidation($request);
         $security = $request->getAttribute('swagger')['security'];
-        if (!$this->checkSecurity($request, $security)) {
+        if (!$this->checkSecurity($securityValidation, $security)) {
             throw new HttpError\Unauthorized('Unacceptable security passed in request');
         }
 
@@ -52,22 +53,13 @@ class Validation implements LoggerAwareInterface
     }
 
     /**
-     * @param RequestInterface $request
+     * @param SecurityValidation $securityValidation
      * @param array $security
      * @return boolean
      */
-    public function checkSecurity(RequestInterface $request, array $security)
+    public function checkSecurity(SecurityValidation $securityValidation, array $security)
     {
-        $metSecurity = array_filter($security, function ($scheme) use ($request) {
-            if ($scheme['type'] === 'basic') {
-                $authHeader = $request->getHeader('Authorization');
-                $authHeader = explode(' ', $authHeader);
-                return ($authHeader[0] === 'Basic' && preg_match('/^[a-z0-9]+$/i', $authHeader[1]) === 1);
-            }
-            // todo oauth
-            return false;
-        });
-
+        $metSecurity = array_filter($security, [$securityValidation, 'checkScheme']);
         return count($metSecurity) > 0;
     }
 

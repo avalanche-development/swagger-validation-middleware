@@ -98,7 +98,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->willReturn(true);
         $validation->expects($this->once())
             ->method('checkSecurity')
-            ->with($mockRequest, $allowedSecurities)
+            ->with(
+                $this->isInstanceOf(SecurityValidation::class),
+                $allowedSecurities
+            )
             ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
@@ -266,6 +269,106 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
 
         $this->assertSame($mockCallStackResponse, $result);
+    }
+
+    public function testCheckSecurityPassesEachSchemeAgainstSecurityValidation()
+    {
+        $mockSecurity = [
+            [ 'one' ],
+            [ 'two' ],
+        ];
+
+        $mockRequest = $this->createMock(ServerRequestInterface::class);
+
+        $mockSecurityValidation = $this->getMockBuilder(SecurityValidation::class)
+            ->setConstructorArgs([ $mockRequest ])
+            ->getMock();
+        $mockSecurityValidation->expects($this->exactly(count($mockSecurity)))
+            ->method('checkScheme')
+            ->withConsecutive(
+              [ $mockSecurity[0] ],
+              [ $mockSecurity[1] ]
+            );
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedCheckSecurity = $reflectedValidation->getMethod('checkSecurity');
+        $reflectedCheckSecurity->setAccessible(true);
+
+        $validation = $this->getMockBuilder(Validation::class)
+            ->disableOriginalConstructor()
+            ->setMethods(null)
+            ->getMock();
+
+        $reflectedCheckSecurity->invokeArgs($validation, [
+            $mockSecurityValidation,
+            $mockSecurity,
+        ]);
+    }
+
+    public function testCheckSecurityReturnsTrueIfSecurityValidationReturnsTrueForAtLeastOneScheme()
+    {
+        $mockSecurity = [
+            [ 'valid' ],
+            [ 'invalid' ],
+        ];
+
+        $mockRequest = $this->createMock(ServerRequestInterface::class);
+
+        $mockSecurityValidation = $this->getMockBuilder(SecurityValidation::class)
+            ->setConstructorArgs([ $mockRequest ])
+            ->getMock();
+        $mockSecurityValidation->method('checkScheme')
+            ->will($this->returnCallback(function ($scheme) {
+                return current($scheme) === 'valid';
+            }));
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedCheckSecurity = $reflectedValidation->getMethod('checkSecurity');
+        $reflectedCheckSecurity->setAccessible(true);
+
+        $validation = $this->getMockBuilder(Validation::class)
+            ->disableOriginalConstructor()
+            ->setMethods(null)
+            ->getMock();
+
+        $result = $reflectedCheckSecurity->invokeArgs($validation, [
+            $mockSecurityValidation,
+            $mockSecurity,
+        ]);
+        $this->assertTrue($result);
+    }
+
+    public function testCheckSecurityReturnsFalseIfSecurityValidationReturnsFalseForAllSchemes()
+    {
+        $mockRequest = $this->createMock(ServerRequestInterface::class);
+
+        $mockSecurity = [
+            [ 'invalid' ],
+        ];
+
+        $mockRequest = $this->createMock(ServerRequestInterface::class);
+
+        $mockSecurityValidation = $this->getMockBuilder(SecurityValidation::class)
+            ->setConstructorArgs([ $mockRequest ])
+            ->getMock();
+        $mockSecurityValidation->method('checkScheme')
+            ->willReturn(false);
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedCheckSecurity = $reflectedValidation->getMethod('checkSecurity');
+        $reflectedCheckSecurity->setAccessible(true);
+
+        $validation = $this->getMockBuilder(Validation::class)
+            ->disableOriginalConstructor()
+            ->setMethods(null)
+            ->getMock();
+
+        $result = $reflectedCheckSecurity->invokeArgs($validation, [
+            $mockSecurityValidation,
+            $mockSecurity,
+        ]);
+
+        $this->assertFalse($result);
     }
 
     public function testCheckSchemeReturnsTrueIfRequestSchemeIsAllowed()
