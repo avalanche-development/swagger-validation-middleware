@@ -99,7 +99,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $validation->expects($this->once())
             ->method('checkSecurity')
             ->with(
-                $this->isInstanceOf(SecurityValidation::class),
+                $this->isInstanceOf(SecurityCheck::class),
                 $allowedSecurities
             )
             ->willReturn(true);
@@ -271,7 +271,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $this->assertSame($mockCallStackResponse, $result);
     }
 
-    public function testCheckSecurityPassesEachSchemeAgainstSecurityValidation()
+    public function testCheckSecurityPassesEachSchemeAgainstSecurityCheck()
     {
         $mockSecurity = [
             [ 'one' ],
@@ -280,10 +280,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
         $mockRequest = $this->createMock(ServerRequestInterface::class);
 
-        $mockSecurityValidation = $this->getMockBuilder(SecurityValidation::class)
+        $mockSecurityCheck = $this->getMockBuilder(SecurityCheck::class)
             ->setConstructorArgs([ $mockRequest ])
             ->getMock();
-        $mockSecurityValidation->expects($this->exactly(count($mockSecurity)))
+        $mockSecurityCheck->expects($this->exactly(count($mockSecurity)))
             ->method('checkScheme')
             ->withConsecutive(
               [ $mockSecurity[0] ],
@@ -300,12 +300,12 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $reflectedCheckSecurity->invokeArgs($validation, [
-            $mockSecurityValidation,
+            $mockSecurityCheck,
             $mockSecurity,
         ]);
     }
 
-    public function testCheckSecurityReturnsTrueIfSecurityValidationReturnsTrueForAtLeastOneScheme()
+    public function testCheckSecurityReturnsTrueIfSecurityCheckReturnsTrueForAtLeastOneScheme()
     {
         $mockSecurity = [
             [ 'valid' ],
@@ -314,10 +314,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
         $mockRequest = $this->createMock(ServerRequestInterface::class);
 
-        $mockSecurityValidation = $this->getMockBuilder(SecurityValidation::class)
+        $mockSecurityCheck = $this->getMockBuilder(SecurityCheck::class)
             ->setConstructorArgs([ $mockRequest ])
             ->getMock();
-        $mockSecurityValidation->method('checkScheme')
+        $mockSecurityCheck->method('checkScheme')
             ->will($this->returnCallback(function ($scheme) {
                 return current($scheme) === 'valid';
             }));
@@ -332,13 +332,13 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $result = $reflectedCheckSecurity->invokeArgs($validation, [
-            $mockSecurityValidation,
+            $mockSecurityCheck,
             $mockSecurity,
         ]);
         $this->assertTrue($result);
     }
 
-    public function testCheckSecurityReturnsFalseIfSecurityValidationReturnsFalseForAllSchemes()
+    public function testCheckSecurityReturnsFalseIfSecurityCheckReturnsFalseForAllSchemes()
     {
         $mockRequest = $this->createMock(ServerRequestInterface::class);
 
@@ -348,10 +348,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
         $mockRequest = $this->createMock(ServerRequestInterface::class);
 
-        $mockSecurityValidation = $this->getMockBuilder(SecurityValidation::class)
+        $mockSecurityCheck = $this->getMockBuilder(SecurityCheck::class)
             ->setConstructorArgs([ $mockRequest ])
             ->getMock();
-        $mockSecurityValidation->method('checkScheme')
+        $mockSecurityCheck->method('checkScheme')
             ->willReturn(false);
 
         $reflectedValidation = new ReflectionClass(Validation::class);
@@ -364,7 +364,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $result = $reflectedCheckSecurity->invokeArgs($validation, [
-            $mockSecurityValidation,
+            $mockSecurityCheck,
             $mockSecurity,
         ]);
 

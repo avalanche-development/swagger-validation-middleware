@@ -4,7 +4,7 @@ namespace AvalancheDevelopment\SwaggerValidationMiddleware;
 
 use Psr\Http\Message\RequestInterface;
 
-class SecurityValidation
+class SecurityCheck
 {
 
     /**
