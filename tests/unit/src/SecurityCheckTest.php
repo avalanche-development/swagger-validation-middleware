@@ -16,9 +16,77 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
         $this->assertAttributeSame($mockRequest, 'request', $securityCheck);
     }
 
-    public function testCheckSchemeUsesBasicCheckIfBasicType() {}
-    public function testCheckSchemeUsesOAuthCheckIfOAuthType() {}
-    public function testCheckSchemeReturnsFalseIfUnknownType() {}
+    public function testCheckSchemeUsesBasicCheckIfBasicType()
+    {
+        $mockScheme = [
+            'type' => 'basic',
+        ];
+
+        $securityCheck = $this->getMockBuilder(SecurityCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkBasicScheme',
+                'checkOAuthScheme',
+            ])
+            ->getMock();
+        $securityCheck->expects($this->once())
+            ->method('checkBasicScheme')
+            ->willReturn(true);
+        $securityCheck->expects($this->never())
+            ->method('checkOAuthScheme');
+
+        $result = $securityCheck->checkScheme($mockScheme);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCheckSchemeUsesOAuthCheckIfOAuthType()
+    {
+        $mockScheme = [
+            'type' => 'oauth',
+        ];
+
+        $securityCheck = $this->getMockBuilder(SecurityCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkBasicScheme',
+                'checkOAuthScheme',
+            ])
+            ->getMock();
+        $securityCheck->expects($this->never())
+            ->method('checkBasicScheme');
+        $securityCheck->expects($this->once())
+            ->method('checkOAuthScheme')
+            ->with($mockScheme)
+            ->willReturn(true);
+
+        $result = $securityCheck->checkScheme($mockScheme);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCheckSchemeReturnsFalseIfUnknownType()
+    {
+        $mockScheme = [
+            'type' => 'invalid',
+        ];
+
+        $securityCheck = $this->getMockBuilder(SecurityCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkBasicScheme',
+                'checkOAuthScheme',
+            ])
+            ->getMock();
+        $securityCheck->expects($this->never())
+            ->method('checkBasicScheme');
+        $securityCheck->expects($this->never())
+            ->method('checkOAuthScheme');
+
+        $result = $securityCheck->checkScheme($mockScheme);
+
+        $this->assertFalse($result);
+    }
 
     public function testCheckBasicSchemePullsAuthorizationFromHeader() {}
     public function testCheckBasicSchemeReturnsFalseIfNotBasicAuth() {}
