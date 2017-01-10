@@ -76,6 +76,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('getAttribute')
             ->with('swagger')
             ->willReturn([
+                'consumes' => [],
+                'produces' => [],
                 'schemes' => [],
                 'security' => $allowedSecurities,
             ]);
@@ -162,6 +164,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('getAttribute')
             ->with('swagger')
             ->willReturn([
+                'consumes' => [],
+                'produces' => [],
                 'schemes' => $allowedSchemes,
                 'security' => [],
             ]);
@@ -240,6 +244,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('getAttribute')
             ->with('swagger')
             ->willReturn([
+                'consumes' => [],
+                'produces' => [],
                 'schemes' => [],
                 'security' => [],
             ]);
