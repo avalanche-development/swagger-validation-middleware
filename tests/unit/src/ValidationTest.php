@@ -30,6 +30,14 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($logger, 'logger', $validation);
     }
 
+    public function testConstructSetsHeaderCheck()
+    {
+        $headerCheck = new HeaderCheck;
+        $validation = new Validation;
+
+        $this->assertAttributeEquals($headerCheck, 'headerCheck', $validation);
+    }
+
     public function testInvokeBailsIfNoSwaggerFound()
     {
         $mockRequest = $this->createMock(ServerRequestInterface::class);
@@ -88,6 +96,18 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             return $response;
         };
 
+        $mockHeaderCheck = $this->createMock(HeaderCheck::class);
+        $mockHeaderCheck->method('checkIncomingContent')
+            ->willReturn(true);
+        $mockHeaderCheck->method('checkOutgoingContent')
+            ->willReturn(true);
+        $mockHeaderCheck->method('checkAcceptHeader')
+            ->willReturn(true);
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
+        $reflectedHeaderCheck->setAccessible(true);
+
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
@@ -108,6 +128,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $validation->expects($this->never())
             ->method('log');
 
+        $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
 
         $this->assertSame($mockResponse, $result);
@@ -124,6 +146,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('getAttribute')
             ->with('swagger')
             ->willReturn([
+                'consumes' => [],
+                'produces' => [],
                 'schemes' => [],
                 'security' => [],
             ]);
@@ -176,6 +200,18 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             return $response;
         };
 
+        $mockHeaderCheck = $this->createMock(HeaderCheck::class);
+        $mockHeaderCheck->method('checkIncomingContent')
+            ->willReturn(true);
+        $mockHeaderCheck->method('checkOutgoingContent')
+            ->willReturn(true);
+        $mockHeaderCheck->method('checkAcceptHeader')
+            ->willReturn(true);
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
+        $reflectedHeaderCheck->setAccessible(true);
+
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
@@ -193,6 +229,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $validation->expects($this->never())
             ->method('log');
 
+        $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
 
         $this->assertSame($mockResponse, $result);
@@ -209,6 +247,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('getAttribute')
             ->with('swagger')
             ->willReturn([
+                'consumes' => [],
+                'produces' => [],
                 'schemes' => [],
                 'security' => [],
             ]);
@@ -218,6 +258,14 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockCallable = function ($request, $response) {
             return $response;
         };
+
+        $mockHeaderCheck = $this->createMock(HeaderCheck::class);
+        $mockHeaderCheck->expects($this->never())
+            ->method('checkIncomingContent');
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
+        $reflectedHeaderCheck->setAccessible(true);
 
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
@@ -233,6 +281,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
+
+        $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
 
         $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
     }
@@ -257,6 +307,18 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             return $mockCallStackResponse;
         };
 
+        $mockHeaderCheck = $this->createMock(HeaderCheck::class);
+        $mockHeaderCheck->method('checkIncomingContent')
+            ->willReturn(true);
+        $mockHeaderCheck->method('checkOutgoingContent')
+            ->willReturn(true);
+        $mockHeaderCheck->method('checkAcceptHeader')
+            ->willReturn(true);
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
+        $reflectedHeaderCheck->setAccessible(true);
+
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
@@ -271,6 +333,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
+
+        $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
 

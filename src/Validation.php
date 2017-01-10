@@ -15,8 +15,13 @@ class Validation implements LoggerAwareInterface
 
     use LoggerAwareTrait;
 
+    /** @var HeaderCheck */
+    protected $headerCheck;
+
     public function __construct()
     {
+        $this->headerCheck = new HeaderCheck;
+
         $this->logger = new NullLogger;
     }
 
@@ -33,7 +38,6 @@ class Validation implements LoggerAwareInterface
             return $next($request, $response);
         }
 
-        $headerCheck = new HeaderCheck;
         $securityCheck = new SecurityCheck($request);
 
         $security = $request->getAttribute('swagger')['security'];
@@ -47,7 +51,7 @@ class Validation implements LoggerAwareInterface
         }
 
         $consumeHeaders = $request->getAttribute('swagger')['consumes'];
-        if (!$headerCheck->checkIncomingContent($request, $consumeHeaders)) {
+        if (!$this->headerCheck->checkIncomingContent($request, $consumeHeaders)) {
             throw new HttpError\NotAcceptable('Unacceptable header was passed into this endpoint');
         }
 
@@ -56,10 +60,10 @@ class Validation implements LoggerAwareInterface
         $result = $next($request, $response);
 
         $produceHeaders = $request->getAttribute('swagger')['produces'];
-        if (!$headerCheck->checkOutgoingContent($result, $produceHeaders)) {
+        if (!$this->headerCheck->checkOutgoingContent($result, $produceHeaders)) {
             throw new HttpError\InternalServerError('Invalid content detected');
         }
-        if (!$headerCheck->checkAcceptHeader($request, $result)) {
+        if (!$this->headerCheck->checkAcceptHeader($request, $result)) {
             throw new HttpError\NotAcceptable('Unacceptable content detected');
         }
 
