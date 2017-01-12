@@ -2,7 +2,7 @@
 
 namespace AvalancheDevelopment\SwaggerValidationMiddleware;
 
-use Psr\Http\MessageInterface;
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -38,8 +38,8 @@ class HeaderCheck
     }
 
     /**
-     * @param RequestInterface
-     * @param ResponseInterface
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
      * @return boolean
      */
     public function checkAcceptHeader(RequestInterface $request, ResponseInterface $response)
