@@ -38,10 +38,10 @@ class Validation implements LoggerAwareInterface
             return $next($request, $response);
         }
 
-        $securityCheck = new SecurityCheck($request);
+        $securityCheck = new SecurityCheck;
 
         $security = $request->getAttribute('swagger')['security'];
-        if (!$this->checkSecurity($securityCheck, $security)) {
+        if (!$this->checkSecurity($securityCheck, $request, $security)) {
             throw new HttpError\Unauthorized('Unacceptable security passed in request');
         }
 
@@ -74,12 +74,15 @@ class Validation implements LoggerAwareInterface
 
     /**
      * @param SecurityCheck $securityCheck
+     * @param RequestInterface $request
      * @param array $security
      * @return boolean
      */
-    public function checkSecurity(SecurityCheck $securityCheck, array $security)
+    public function checkSecurity(SecurityCheck $securityCheck, RequestInterface $request, array $security)
     {
-        $metSecurity = array_filter($security, [$securityCheck, 'checkScheme']);
+        $metSecurity = array_filter($security, function ($scheme) use ($securityCheck, $request) {
+          return $securityCheck->checkScheme($request, $scheme);
+        });
         return count($metSecurity) > 0;
     }
 

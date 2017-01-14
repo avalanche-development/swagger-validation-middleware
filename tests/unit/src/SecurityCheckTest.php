@@ -8,16 +8,9 @@ use Psr\Http\Message\RequestInterface;
 class SecurityCheckTest extends PHPUnit_Framework_TestCase
 {
 
-    public function testConstructSetsRequest()
-    {
-        $mockRequest = $this->createMock(RequestInterface::class);
-        $securityCheck = new SecurityCheck($mockRequest);
-
-        $this->assertAttributeSame($mockRequest, 'request', $securityCheck);
-    }
-
     public function testCheckSchemeUsesBasicCheckIfBasicType()
     {
+        $mockRequest = $this->createMock(RequestInterface::class);
         $mockScheme = [
             'type' => 'basic',
         ];
@@ -31,17 +24,19 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
             ->getMock();
         $securityCheck->expects($this->once())
             ->method('checkBasicScheme')
+            ->with($mockRequest)
             ->willReturn(true);
         $securityCheck->expects($this->never())
             ->method('checkOAuthScheme');
 
-        $result = $securityCheck->checkScheme($mockScheme);
+        $result = $securityCheck->checkScheme($mockRequest, $mockScheme);
 
         $this->assertTrue($result);
     }
 
     public function testCheckSchemeUsesOAuthCheckIfOAuthType()
     {
+        $mockRequest = $this->createMock(RequestInterface::class);
         $mockScheme = [
             'type' => 'oauth',
         ];
@@ -57,16 +52,17 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
             ->method('checkBasicScheme');
         $securityCheck->expects($this->once())
             ->method('checkOAuthScheme')
-            ->with($mockScheme)
+            ->with($mockRequest, $mockScheme)
             ->willReturn(true);
 
-        $result = $securityCheck->checkScheme($mockScheme);
+        $result = $securityCheck->checkScheme($mockRequest, $mockScheme);
 
         $this->assertTrue($result);
     }
 
     public function testCheckSchemeReturnsFalseIfUnknownType()
     {
+        $mockRequest = $this->createMock(RequestInterface::class);
         $mockScheme = [
             'type' => 'invalid',
         ];
@@ -83,7 +79,7 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
         $securityCheck->expects($this->never())
             ->method('checkOAuthScheme');
 
-        $result = $securityCheck->checkScheme($mockScheme);
+        $result = $securityCheck->checkScheme($mockRequest, $mockScheme);
 
         $this->assertFalse($result);
     }
