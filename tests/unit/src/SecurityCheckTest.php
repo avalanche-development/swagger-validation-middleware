@@ -9,12 +9,88 @@ use ReflectionClass;
 class SecurityCheckTest extends PHPUnit_Framework_TestCase
 {
 
+    public function testCheckSecurityPassesEachSchemeAgainstSecurityCheck()
+    {
+        $mockSecurity = [
+            [ 'one' ],
+            [ 'two' ],
+        ];
+
+        $mockRequest = $this->createMock(RequestInterface::class);
+
+        $securityCheck = $this->getMockBuilder(SecurityCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([ 'checkScheme' ])
+            ->getMock();
+        $securityCheck->expects($this->exactly(count($mockSecurity)))
+            ->method('checkScheme')
+            ->withConsecutive(
+                [
+                    $mockRequest,
+                    $mockSecurity[0],
+                ],
+                [
+                    $mockRequest,
+                    $mockSecurity[1],
+                ]
+            );
+
+        $securityCheck->checkSecurity($mockRequest, $mockSecurity);
+    }
+
+    public function testCheckSecurityReturnsTrueIfSecurityCheckReturnsTrueForAtLeastOneScheme()
+    {
+        $mockSecurity = [
+            [ 'valid' ],
+            [ 'invalid' ],
+        ];
+
+        $mockRequest = $this->createMock(RequestInterface::class);
+
+        $securityCheck = $this->getMockBuilder(SecurityCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([ 'checkScheme' ])
+            ->getMock();
+        $securityCheck->method('checkScheme')
+            ->will($this->returnCallback(function ($mockRequest, $scheme) {
+                return current($scheme) === 'valid';
+            }));
+
+        $result = $securityCheck->checkSecurity($mockRequest, $mockSecurity);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCheckSecurityReturnsFalseIfSecurityCheckReturnsFalseForAllSchemes()
+    {
+        $mockSecurity = [
+            [ 'invalid' ],
+        ];
+
+        $mockRequest = $this->createMock(RequestInterface::class);
+
+        $securityCheck = $this->getMockBuilder(SecurityCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([ 'checkScheme' ])
+            ->getMock();
+        $securityCheck->method('checkScheme')
+            ->willReturn(false);
+
+        $result = $securityCheck->checkSecurity($mockRequest, $mockSecurity);
+
+        $this->assertFalse($result);
+    }
+
     public function testCheckSchemeUsesBasicCheckIfBasicType()
     {
         $mockRequest = $this->createMock(RequestInterface::class);
         $mockScheme = [
             'type' => 'basic',
         ];
+
+        $reflectedSecurityCheck = new ReflectionClass(SecurityCheck::class);
+        $reflectedCheckScheme = $reflectedSecurityCheck->getMethod('checkScheme');
+        $reflectedCheckScheme->setAccessible(true);
 
         $securityCheck = $this->getMockBuilder(SecurityCheck::class)
             ->disableOriginalConstructor()
@@ -30,7 +106,10 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
         $securityCheck->expects($this->never())
             ->method('checkOAuthScheme');
 
-        $result = $securityCheck->checkScheme($mockRequest, $mockScheme);
+        $result = $reflectedCheckScheme->invokeArgs($securityCheck, [
+            $mockRequest,
+            $mockScheme,
+        ]);
 
         $this->assertTrue($result);
     }
@@ -41,6 +120,10 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
         $mockScheme = [
             'type' => 'oauth',
         ];
+
+        $reflectedSecurityCheck = new ReflectionClass(SecurityCheck::class);
+        $reflectedCheckScheme = $reflectedSecurityCheck->getMethod('checkScheme');
+        $reflectedCheckScheme->setAccessible(true);
 
         $securityCheck = $this->getMockBuilder(SecurityCheck::class)
             ->disableOriginalConstructor()
@@ -56,7 +139,10 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
             ->with($mockRequest, $mockScheme)
             ->willReturn(true);
 
-        $result = $securityCheck->checkScheme($mockRequest, $mockScheme);
+        $result = $reflectedCheckScheme->invokeArgs($securityCheck, [
+            $mockRequest,
+            $mockScheme,
+        ]);
 
         $this->assertTrue($result);
     }
@@ -67,6 +153,10 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
         $mockScheme = [
             'type' => 'invalid',
         ];
+
+        $reflectedSecurityCheck = new ReflectionClass(SecurityCheck::class);
+        $reflectedCheckScheme = $reflectedSecurityCheck->getMethod('checkScheme');
+        $reflectedCheckScheme->setAccessible(true);
 
         $securityCheck = $this->getMockBuilder(SecurityCheck::class)
             ->disableOriginalConstructor()
@@ -80,7 +170,10 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
         $securityCheck->expects($this->never())
             ->method('checkOAuthScheme');
 
-        $result = $securityCheck->checkScheme($mockRequest, $mockScheme);
+        $result = $reflectedCheckScheme->invokeArgs($securityCheck, [
+            $mockRequest,
+            $mockScheme,
+        ]);
 
         $this->assertFalse($result);
     }

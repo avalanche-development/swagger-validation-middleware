@@ -171,20 +171,27 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             return $response;
         };
 
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->method('checkSecurity')
+            ->willReturn(false);
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
+
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkScheme',
-                'checkSecurity',
                 'log',
             ])
             ->getMock();
         $validation->expects($this->never())
             ->method('checkScheme');
-        $validation->method('checkSecurity')
-            ->willReturn(false);
         $validation->expects($this->never())
             ->method('log');
+
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
     }
@@ -221,15 +228,20 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkAcceptHeader')
             ->willReturn(true);
 
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->method('checkSecurity')
+            ->willReturn(true);
+
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
 
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkScheme',
-                'checkSecurity',
                 'log',
             ])
             ->getMock();
@@ -237,12 +249,11 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('checkScheme')
             ->with($mockRequest, $allowedSchemes)
             ->willReturn(true);
-        $validation->method('checkSecurity')
-            ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
 
@@ -276,26 +287,30 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->expects($this->never())
             ->method('checkIncomingContent');
 
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->method('checkSecurity')
+            ->willReturn(true);
+
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
 
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkScheme',
-                'checkSecurity',
                 'log',
             ])
             ->getMock();
         $validation->method('checkScheme')
             ->willReturn(false);
-        $validation->method('checkSecurity')
-            ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
     }
@@ -333,26 +348,30 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkAcceptHeader')
             ->willReturn(true);
 
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->method('checkSecurity')
+            ->willReturn(true);
+
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
 
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkScheme',
-                'checkSecurity',
                 'log',
             ])
             ->getMock();
         $validation->method('checkScheme')
             ->willReturn(true);
-        $validation->method('checkSecurity')
-            ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
 
@@ -386,26 +405,30 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkIncomingContent')
             ->willReturn(false);
 
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->method('checkSecurity')
+            ->willReturn(true);
+
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
 
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkScheme',
-                'checkSecurity',
                 'log',
             ])
             ->getMock();
         $validation->method('checkScheme')
             ->willReturn(true);
-        $validation->method('checkSecurity')
-            ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
     }
@@ -438,26 +461,30 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkAcceptHeader')
             ->willReturn(true);
 
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->method('checkSecurity')
+            ->willReturn(true);
+
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
 
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkScheme',
-                'checkSecurity',
                 'log',
             ])
             ->getMock();
         $validation->method('checkScheme')
             ->willReturn(true);
-        $validation->method('checkSecurity')
-            ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
 
@@ -497,26 +524,30 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkAcceptHeader')
             ->willReturn(true);
 
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->method('checkSecurity')
+            ->willReturn(true);
+
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
 
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkScheme',
-                'checkSecurity',
                 'log',
             ])
             ->getMock();
         $validation->method('checkScheme')
             ->willReturn(true);
-        $validation->method('checkSecurity')
-            ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
 
@@ -554,26 +585,30 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->expects($this->never())
             ->method('checkAcceptHeader');
 
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->method('checkSecurity')
+            ->willReturn(true);
+
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
 
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkScheme',
-                'checkSecurity',
                 'log',
             ])
             ->getMock();
         $validation->method('checkScheme')
             ->willReturn(true);
-        $validation->method('checkSecurity')
-            ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
     }
@@ -607,26 +642,30 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->with($mockRequest, $mockResponse)
             ->willReturn(true);
 
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->method('checkSecurity')
+            ->willReturn(true);
+
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
 
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkScheme',
-                'checkSecurity',
                 'log',
             ])
             ->getMock();
         $validation->method('checkScheme')
             ->willReturn(true);
-        $validation->method('checkSecurity')
-            ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
 
@@ -664,131 +703,32 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkAcceptHeader')
             ->willReturn(false);
 
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->method('checkSecurity')
+            ->willReturn(true);
+
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
 
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkScheme',
-                'checkSecurity',
                 'log',
             ])
             ->getMock();
         $validation->method('checkScheme')
             ->willReturn(true);
-        $validation->method('checkSecurity')
-            ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
-    }
-
-    public function testCheckSecurityPassesEachSchemeAgainstSecurityCheck()
-    {
-        $mockSecurity = [
-            [ 'one' ],
-            [ 'two' ],
-        ];
-
-        $mockRequest = $this->createMock(ServerRequestInterface::class);
-
-        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
-        $mockSecurityCheck->expects($this->exactly(count($mockSecurity)))
-            ->method('checkScheme')
-            ->withConsecutive(
-                [
-                    $mockRequest,
-                    $mockSecurity[0],
-                ],
-                [
-                    $mockRequest,
-                    $mockSecurity[1],
-                ]
-            );
-
-        $reflectedValidation = new ReflectionClass(Validation::class);
-        $reflectedCheckSecurity = $reflectedValidation->getMethod('checkSecurity');
-        $reflectedCheckSecurity->setAccessible(true);
-
-        $validation = $this->getMockBuilder(Validation::class)
-            ->disableOriginalConstructor()
-            ->setMethods(null)
-            ->getMock();
-
-        $reflectedCheckSecurity->invokeArgs($validation, [
-            $mockSecurityCheck,
-            $mockRequest,
-            $mockSecurity,
-        ]);
-    }
-
-    public function testCheckSecurityReturnsTrueIfSecurityCheckReturnsTrueForAtLeastOneScheme()
-    {
-        $mockSecurity = [
-            [ 'valid' ],
-            [ 'invalid' ],
-        ];
-
-        $mockRequest = $this->createMock(ServerRequestInterface::class);
-
-        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
-        $mockSecurityCheck->method('checkScheme')
-            ->will($this->returnCallback(function ($mockRequest, $scheme) {
-                return current($scheme) === 'valid';
-            }));
-
-        $reflectedValidation = new ReflectionClass(Validation::class);
-        $reflectedCheckSecurity = $reflectedValidation->getMethod('checkSecurity');
-        $reflectedCheckSecurity->setAccessible(true);
-
-        $validation = $this->getMockBuilder(Validation::class)
-            ->disableOriginalConstructor()
-            ->setMethods(null)
-            ->getMock();
-
-        $result = $reflectedCheckSecurity->invokeArgs($validation, [
-            $mockSecurityCheck,
-            $mockRequest,
-            $mockSecurity,
-        ]);
-        $this->assertTrue($result);
-    }
-
-    public function testCheckSecurityReturnsFalseIfSecurityCheckReturnsFalseForAllSchemes()
-    {
-        $mockRequest = $this->createMock(ServerRequestInterface::class);
-
-        $mockSecurity = [
-            [ 'invalid' ],
-        ];
-
-        $mockRequest = $this->createMock(ServerRequestInterface::class);
-
-        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
-        $mockSecurityCheck->method('checkScheme')
-            ->willReturn(false);
-
-        $reflectedValidation = new ReflectionClass(Validation::class);
-        $reflectedCheckSecurity = $reflectedValidation->getMethod('checkSecurity');
-        $reflectedCheckSecurity->setAccessible(true);
-
-        $validation = $this->getMockBuilder(Validation::class)
-            ->disableOriginalConstructor()
-            ->setMethods(null)
-            ->getMock();
-
-        $result = $reflectedCheckSecurity->invokeArgs($validation, [
-            $mockSecurityCheck,
-            $mockRequest,
-            $mockSecurity,
-        ]);
-
-        $this->assertFalse($result);
     }
 
     public function testCheckSchemeReturnsTrueIfRequestSchemeIsAllowed()
