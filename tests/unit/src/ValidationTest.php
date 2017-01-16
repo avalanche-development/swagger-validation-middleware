@@ -22,20 +22,28 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(LoggerAwareInterface::class, $validation);
     }
 
-    public function testConstructSetsNullLogger()
-    {
-        $logger = new NullLogger;
-        $validation = new Validation;
-
-        $this->assertAttributeEquals($logger, 'logger', $validation);
-    }
-
     public function testConstructSetsHeaderCheck()
     {
         $headerCheck = new HeaderCheck;
         $validation = new Validation;
 
         $this->assertAttributeEquals($headerCheck, 'headerCheck', $validation);
+    }
+
+    public function testConstructSetsSecurityCheck()
+    {
+        $securityCheck = new SecurityCheck;
+        $validation = new Validation;
+
+        $this->assertAttributeEquals($securityCheck, 'securityCheck', $validation);
+    }
+
+    public function testConstructSetsNullLogger()
+    {
+        $logger = new NullLogger;
+        $validation = new Validation;
+
+        $this->assertAttributeEquals($logger, 'logger', $validation);
     }
 
     public function testInvokeBailsIfNoSwaggerFound()
@@ -52,21 +60,25 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             return $response;
         };
 
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->expects($this->never())
+            ->method('checkSecurity');
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
+
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
-                'checkScheme',
-                'checkSecurity',
                 'log',
             ])
             ->getMock();
-        $validation->expects($this->never())
-            ->method('checkScheme');
-        $validation->expects($this->never())
-            ->method('checkSecurity');
         $validation->expects($this->once())
             ->method('log')
             ->with('no swagger information found in request, skipping');
+
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
 
@@ -104,32 +116,32 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkAcceptHeader')
             ->willReturn(true);
 
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->expects($this->once())
+            ->method('checkSecurity')
+            ->with($mockRequest, $allowedSecurities)
+            ->willReturn(true);
+
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
 
         $validation = $this->getMockBuilder(Validation::class)
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkScheme',
-                'checkSecurity',
                 'log',
             ])
             ->getMock();
         $validation->method('checkScheme')
             ->willReturn(true);
-        $validation->expects($this->once())
-            ->method('checkSecurity')
-            ->with(
-                $this->isInstanceOf(SecurityCheck::class),
-                $mockRequest,
-                $allowedSecurities
-            )
-            ->willReturn(true);
         $validation->expects($this->never())
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
 

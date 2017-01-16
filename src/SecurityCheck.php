@@ -9,10 +9,27 @@ class SecurityCheck
 
     /**
      * @param RequestInterface $request
+     * @param array $securitySchemes
+     * @return boolean
+     */
+    public function checkSecurity(RequestInterface $request, array $securitySchemes)
+    {
+        $self = $this;
+        $metSecurity = array_filter(
+            $securitySchemes,
+            function ($scheme) use ($self, $request) {
+                return $self->checkScheme($request, $scheme);
+            }
+        );
+        return count($metSecurity) > 0;
+    }
+
+    /**
+     * @param RequestInterface $request
      * @param array $scheme
      * @return boolean
      */
-    public function checkScheme(RequestInterface $request, array $scheme)
+    protected function checkScheme(RequestInterface $request, array $scheme)
     {
         if ($scheme['type'] === 'basic') {
             return $this->checkBasicScheme($request);
