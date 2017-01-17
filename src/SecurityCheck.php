@@ -46,6 +46,7 @@ class SecurityCheck
     protected function checkBasicScheme(RequestInterface $request)
     {
         $authHeader = $request->getHeader('Authorization');
+        $authHeader = current($authHeader);
         $authHeader = explode(' ', $authHeader);
         return ($authHeader[0] === 'Basic' && preg_match('/^[a-z0-9]+$/i', $authHeader[1]) === 1);
     }

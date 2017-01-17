@@ -184,7 +184,7 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
         $mockRequest->expects($this->once())
             ->method('getHeader')
             ->with('Authorization')
-            ->willReturn('Basic Header');
+            ->willReturn([ 'Basic Header' ]);
 
         $reflectedSecurityCheck = new ReflectionClass(SecurityCheck::class);
         $reflectedCheckBasicScheme = $reflectedSecurityCheck->getMethod('checkBasicScheme');
@@ -201,7 +201,7 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
     {
         $mockRequest = $this->createMock(RequestInterface::class);
         $mockRequest->method('getHeader')
-            ->willReturn('Bearer Header');
+            ->willReturn([ 'Bearer Header' ]);
 
         $reflectedSecurityCheck = new ReflectionClass(SecurityCheck::class);
         $reflectedCheckBasicScheme = $reflectedSecurityCheck->getMethod('checkBasicScheme');
@@ -220,7 +220,7 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
     {
         $mockRequest = $this->createMock(RequestInterface::class);
         $mockRequest->method('getHeader')
-            ->willReturn('Basic ');
+            ->willReturn([ 'Basic ' ]);
 
         $reflectedSecurityCheck = new ReflectionClass(SecurityCheck::class);
         $reflectedCheckBasicScheme = $reflectedSecurityCheck->getMethod('checkBasicScheme');
@@ -239,7 +239,7 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
     {
         $mockRequest = $this->createMock(RequestInterface::class);
         $mockRequest->method('getHeader')
-            ->willReturn('Basic Header');
+            ->willReturn([ 'Basic Header' ]);
 
         $reflectedSecurityCheck = new ReflectionClass(SecurityCheck::class);
         $reflectedCheckBasicScheme = $reflectedSecurityCheck->getMethod('checkBasicScheme');
