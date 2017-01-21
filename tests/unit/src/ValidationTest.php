@@ -2,6 +2,7 @@
 
 namespace AvalancheDevelopment\SwaggerValidationMiddleware;
 
+use AvalancheDevelopment\SwaggerRouterMiddleware\ParsedSwaggerInterface;
 use PHPUnit_Framework_TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -91,16 +92,22 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             'type' => 'basic',
         ];
 
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->method('getProduces')
+            ->willReturn([]);
+        $mockSwagger->method('getSchemes')
+            ->willReturn([]);
+        $mockSwagger->expects($this->once())
+            ->method('getSecurity')
+            ->willReturn($allowedSecurities);
+
         $mockRequest = $this->createMock(ServerRequestInterface::class);
         $mockRequest->expects($this->any())
             ->method('getAttribute')
             ->with('swagger')
-            ->willReturn([
-                'consumes' => [],
-                'produces' => [],
-                'schemes' => [],
-                'security' => $allowedSecurities,
-            ]);
+            ->willReturn($mockSwagger);
 
         $mockResponse = $this->createMock(ResponseInterface::class);
 
@@ -154,16 +161,22 @@ class ValidationTest extends PHPUnit_Framework_TestCase
      */
     public function testInvokeBailsIfUnacceptableSecurityInRequest()
     {
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->expects($this->never())
+            ->method('getConsumes');
+        $mockSwagger->expects($this->never())
+            ->method('getProduces');
+        $mockSwagger->expects($this->never())
+            ->method('getSchemes');
+        $mockSwagger->expects($this->once())
+            ->method('getSecurity')
+            ->willReturn([]);
+
         $mockRequest = $this->createMock(ServerRequestInterface::class);
         $mockRequest->expects($this->any())
             ->method('getAttribute')
             ->with('swagger')
-            ->willReturn([
-                'consumes' => [],
-                'produces' => [],
-                'schemes' => [],
-                'security' => [],
-            ]);
+            ->willReturn($mockSwagger);
 
         $mockResponse = $this->createMock(ResponseInterface::class);
 
@@ -203,16 +216,22 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             'https',
         ];
 
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->method('getProduces')
+            ->willReturn([]);
+        $mockSwagger->expects($this->once())
+            ->method('getSchemes')
+            ->willReturn($allowedSchemes);
+        $mockSwagger->method('getSecurity')
+            ->willReturn([]);
+
         $mockRequest = $this->createMock(ServerRequestInterface::class);
         $mockRequest->expects($this->any())
             ->method('getAttribute')
             ->with('swagger')
-            ->willReturn([
-                'consumes' => [],
-                'produces' => [],
-                'schemes' => $allowedSchemes,
-                'security' => [],
-            ]);
+            ->willReturn($mockSwagger);
 
         $mockResponse = $this->createMock(ResponseInterface::class);
 
@@ -266,16 +285,22 @@ class ValidationTest extends PHPUnit_Framework_TestCase
      */
     public function testInvokeBailsIfUnacceptableSchemeInRequest()
     {
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->expects($this->never())
+            ->method('getConsumes');
+        $mockSwagger->expects($this->never())
+            ->method('getProduces');
+        $mockSwagger->expects($this->once())
+            ->method('getSchemes')
+            ->willReturn([]);
+        $mockSwagger->method('getSecurity')
+            ->willReturn([]);
+
         $mockRequest = $this->createMock(ServerRequestInterface::class);
         $mockRequest->expects($this->any())
             ->method('getAttribute')
             ->with('swagger')
-            ->willReturn([
-                'consumes' => [],
-                'produces' => [],
-                'schemes' => [],
-                'security' => [],
-            ]);
+            ->willReturn($mockSwagger);
 
         $mockResponse = $this->createMock(ResponseInterface::class);
 
@@ -321,16 +346,22 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             'application/json',
         ];
 
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->expects($this->once())
+            ->method('getConsumes')
+            ->willReturn($allowedConsumeTypes);
+        $mockSwagger->method('getProduces')
+            ->willReturn([]);
+        $mockSwagger->method('getSchemes')
+            ->willReturn([]);
+        $mockSwagger->method('getSecurity')
+            ->willReturn([]);
+
         $mockRequest = $this->createMock(ServerRequestInterface::class);
         $mockRequest->expects($this->any())
             ->method('getAttribute')
             ->with('swagger')
-            ->willReturn([
-                'consumes' => $allowedConsumeTypes,
-                'produces' => [],
-                'schemes' => [],
-                'security' => [],
-            ]);
+            ->willReturn($mockSwagger);
 
         $mockResponse = $this->createMock(ResponseInterface::class);
 
@@ -384,16 +415,22 @@ class ValidationTest extends PHPUnit_Framework_TestCase
      */
     public function testInvokeBailsIfUnacceptableContentInRequest()
     {
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->expects($this->once())
+            ->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->expects($this->never())
+            ->method('getProduces');
+        $mockSwagger->method('getSchemes')
+            ->willReturn([]);
+        $mockSwagger->method('getSecurity')
+            ->willReturn([]);
+
         $mockRequest = $this->createMock(ServerRequestInterface::class);
         $mockRequest->expects($this->any())
             ->method('getAttribute')
             ->with('swagger')
-            ->willReturn([
-                'consumes' => [],
-                'produces' => [],
-                'schemes' => [],
-                'security' => [],
-            ]);
+            ->willReturn($mockSwagger);
 
         $mockResponse = $this->createMock(ResponseInterface::class);
 
@@ -435,16 +472,21 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
     public function testInvokePassesAlongResponseFromCallStack()
     {
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->method('getProduces')
+            ->willReturn([]);
+        $mockSwagger->method('getSchemes')
+            ->willReturn([]);
+        $mockSwagger->method('getSecurity')
+            ->willReturn([]);
+
         $mockRequest = $this->createMock(ServerRequestInterface::class);
         $mockRequest->expects($this->any())
             ->method('getAttribute')
             ->with('swagger')
-            ->willReturn([
-                'consumes' => [],
-                'produces' => [],
-                'schemes' => [],
-                'security' => [],
-            ]);
+            ->willReturn($mockSwagger);
 
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockCallStackResponse = $this->createMock(ResponseInterface::class);
@@ -497,16 +539,22 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             'application/json',
         ];
 
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->expects($this->once())
+            ->method('getProduces')
+            ->willReturn($allowedProduceTypes);
+        $mockSwagger->method('getSchemes')
+            ->willReturn([]);
+        $mockSwagger->method('getSecurity')
+            ->willReturn([]);
+
         $mockRequest = $this->createMock(ServerRequestInterface::class);
         $mockRequest->expects($this->any())
             ->method('getAttribute')
             ->with('swagger')
-            ->willReturn([
-                'consumes' => [],
-                'produces' => $allowedProduceTypes,
-                'schemes' => [],
-                'security' => [],
-            ]);
+            ->willReturn($mockSwagger);
 
         $mockResponse = $this->createMock(ResponseInterface::class);
 
@@ -560,16 +608,22 @@ class ValidationTest extends PHPUnit_Framework_TestCase
      */
     public function testInvokeBailsIfUnproducibleContentInResponse()
     {
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->expects($this->once())
+            ->method('getProduces')
+            ->willReturn([]);
+        $mockSwagger->method('getSchemes')
+            ->willReturn([]);
+        $mockSwagger->method('getSecurity')
+            ->willReturn([]);
+
         $mockRequest = $this->createMock(ServerRequestInterface::class);
         $mockRequest->expects($this->any())
             ->method('getAttribute')
             ->with('swagger')
-            ->willReturn([
-                'consumes' => [],
-                'produces' => [],
-                'schemes' => [],
-                'security' => [],
-            ]);
+            ->willReturn($mockSwagger);
 
         $mockResponse = $this->createMock(ResponseInterface::class);
 
@@ -615,16 +669,21 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
     public function testInvokeChecksResponseContentAgainstRequestAccept()
     {
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->method('getProduces')
+            ->willReturn([]);
+        $mockSwagger->method('getSchemes')
+            ->willReturn([]);
+        $mockSwagger->method('getSecurity')
+            ->willReturn([]);
+
         $mockRequest = $this->createMock(ServerRequestInterface::class);
         $mockRequest->expects($this->any())
             ->method('getAttribute')
             ->with('swagger')
-            ->willReturn([
-                'consumes' => [],
-                'produces' => [],
-                'schemes' => [],
-                'security' => [],
-            ]);
+            ->willReturn($mockSwagger);
 
         $mockResponse = $this->createMock(ResponseInterface::class);
 
@@ -678,16 +737,21 @@ class ValidationTest extends PHPUnit_Framework_TestCase
      */
     public function testInvokeBailsIfUnacceptableContentInResponse()
     {
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->method('getProduces')
+            ->willReturn([]);
+        $mockSwagger->method('getSchemes')
+            ->willReturn([]);
+        $mockSwagger->method('getSecurity')
+            ->willReturn([]);
+
         $mockRequest = $this->createMock(ServerRequestInterface::class);
         $mockRequest->expects($this->any())
             ->method('getAttribute')
             ->with('swagger')
-            ->willReturn([
-                'consumes' => [],
-                'produces' => [],
-                'schemes' => [],
-                'security' => [],
-            ]);
+            ->willReturn($mockSwagger);
 
         $mockResponse = $this->createMock(ResponseInterface::class);
 

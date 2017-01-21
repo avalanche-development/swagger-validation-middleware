@@ -42,17 +42,17 @@ class Validation implements LoggerAwareInterface
             return $next($request, $response);
         }
 
-        $security = $request->getAttribute('swagger')['security'];
+        $security = $request->getAttribute('swagger')->getSecurity();
         if (!$this->securityCheck->checkSecurity($request, $security)) {
             throw new HttpError\Unauthorized('Unacceptable security passed in request');
         }
 
-        $schemes = $request->getAttribute('swagger')['schemes'];
+        $schemes = $request->getAttribute('swagger')->getSchemes();
         if (!$this->checkScheme($request, $schemes)) {
             throw new HttpError\NotFound('Unallowed scheme in request');
         }
 
-        $consumeHeaders = $request->getAttribute('swagger')['consumes'];
+        $consumeHeaders = $request->getAttribute('swagger')->getConsumes();
         if (!$this->headerCheck->checkIncomingContent($request, $consumeHeaders)) {
             throw new HttpError\NotAcceptable('Unacceptable header was passed into this endpoint');
         }
@@ -61,7 +61,7 @@ class Validation implements LoggerAwareInterface
 
         $result = $next($request, $response);
 
-        $produceHeaders = $request->getAttribute('swagger')['produces'];
+        $produceHeaders = $request->getAttribute('swagger')->getProduces();
         if (!$this->headerCheck->checkOutgoingContent($result, $produceHeaders)) {
             throw new HttpError\InternalServerError('Invalid content detected');
         }
