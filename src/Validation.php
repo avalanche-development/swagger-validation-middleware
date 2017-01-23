@@ -18,12 +18,16 @@ class Validation implements LoggerAwareInterface
     /** @var HeaderCheck */
     protected $headerCheck;
 
+    /** @var ParameterCheck */
+    protected $parameterCheck;
+
     /** @var SecurityCheck */
     protected $securityCheck;
 
     public function __construct()
     {
         $this->headerCheck = new HeaderCheck;
+        $this->parameterCheck = new ParameterCheck;
         $this->securityCheck = new SecurityCheck;
 
         $this->logger = new NullLogger;
@@ -57,7 +61,10 @@ class Validation implements LoggerAwareInterface
             throw new HttpError\NotAcceptable('Unacceptable header was passed into this endpoint');
         }
 
-        // todo check parameters
+        $params = $request->getAttribute('swagger')->getParams();
+        if (!$this->parameterCheck->checkParams($request, $params)) {
+            throw new HttpError\BadRequest('Bad parameters passed in request');
+        }
 
         $result = $next($request, $response);
 

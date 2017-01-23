@@ -31,6 +31,14 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($headerCheck, 'headerCheck', $validation);
     }
 
+    public function testConstructSetsParameterCheck()
+    {
+        $parameterCheck = new ParameterCheck;
+        $validation = new Validation;
+
+        $this->assertAttributeEquals($parameterCheck, 'parameterCheck', $validation);
+    }
+
     public function testConstructSetsSecurityCheck()
     {
         $securityCheck = new SecurityCheck;
@@ -95,6 +103,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->method('getConsumes')
             ->willReturn([]);
+        $mockSwagger->method('getParams')
+            ->willReturn([]);
         $mockSwagger->method('getProduces')
             ->willReturn([]);
         $mockSwagger->method('getSchemes')
@@ -123,6 +133,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkAcceptHeader')
             ->willReturn(true);
 
+        $mockParameterCheck = $this->createMock(ParameterCheck::class);
+        $mockParameterCheck->method('checkParams')
+            ->willReturn(true);
+
         $mockSecurityCheck = $this->createMock(SecurityCheck::class);
         $mockSecurityCheck->expects($this->once())
             ->method('checkSecurity')
@@ -132,6 +146,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedParameterCheck = $reflectedValidation->getProperty('parameterCheck');
+        $reflectedParameterCheck->setAccessible(true);
         $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
         $reflectedSecurityCheck->setAccessible(true);
 
@@ -148,6 +164,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedParameterCheck->setValue($validation, $mockParameterCheck);
         $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
@@ -164,6 +181,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->expects($this->never())
             ->method('getConsumes');
+        $mockSwagger->expects($this->never())
+            ->method('getParams');
         $mockSwagger->expects($this->never())
             ->method('getProduces');
         $mockSwagger->expects($this->never())
@@ -219,6 +238,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->method('getConsumes')
             ->willReturn([]);
+        $mockSwagger->method('getParams')
+            ->willReturn([]);
         $mockSwagger->method('getProduces')
             ->willReturn([]);
         $mockSwagger->expects($this->once())
@@ -247,6 +268,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkAcceptHeader')
             ->willReturn(true);
 
+        $mockParameterCheck = $this->createMock(ParameterCheck::class);
+        $mockParameterCheck->method('checkParams')
+            ->willReturn(true);
+
         $mockSecurityCheck = $this->createMock(SecurityCheck::class);
         $mockSecurityCheck->method('checkSecurity')
             ->willReturn(true);
@@ -254,6 +279,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedParameterCheck = $reflectedValidation->getProperty('parameterCheck');
+        $reflectedParameterCheck->setAccessible(true);
         $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
         $reflectedSecurityCheck->setAccessible(true);
 
@@ -272,6 +299,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedParameterCheck->setValue($validation, $mockParameterCheck);
         $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
@@ -288,6 +316,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->expects($this->never())
             ->method('getConsumes');
+        $mockSwagger->expects($this->never())
+            ->method('getParams');
         $mockSwagger->expects($this->never())
             ->method('getProduces');
         $mockSwagger->expects($this->once())
@@ -350,6 +380,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockSwagger->expects($this->once())
             ->method('getConsumes')
             ->willReturn($allowedConsumeTypes);
+        $mockSwagger->method('getParams')
+            ->willReturn([]);
         $mockSwagger->method('getProduces')
             ->willReturn([]);
         $mockSwagger->method('getSchemes')
@@ -379,6 +411,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkAcceptHeader')
             ->willReturn(true);
 
+        $mockParameterCheck = $this->createMock(ParameterCheck::class);
+        $mockParameterCheck->method('checkParams')
+            ->willReturn(true);
+
         $mockSecurityCheck = $this->createMock(SecurityCheck::class);
         $mockSecurityCheck->method('checkSecurity')
             ->willReturn(true);
@@ -386,6 +422,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedParameterCheck = $reflectedValidation->getProperty('parameterCheck');
+        $reflectedParameterCheck->setAccessible(true);
         $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
         $reflectedSecurityCheck->setAccessible(true);
 
@@ -402,6 +440,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedParameterCheck->setValue($validation, $mockParameterCheck);
         $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
@@ -418,6 +457,156 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->expects($this->once())
             ->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->expects($this->never())
+            ->method('getParams');
+        $mockSwagger->expects($this->never())
+            ->method('getProduces');
+        $mockSwagger->method('getSchemes')
+            ->willReturn([]);
+        $mockSwagger->method('getSecurity')
+            ->willReturn([]);
+
+        $mockRequest = $this->createMock(ServerRequestInterface::class);
+        $mockRequest->expects($this->any())
+            ->method('getAttribute')
+            ->with('swagger')
+            ->willReturn($mockSwagger);
+
+        $mockResponse = $this->createMock(ResponseInterface::class);
+
+        $mockCallable = function ($request, $response) {
+            return $response;
+        };
+
+        $mockHeaderCheck = $this->createMock(HeaderCheck::class);
+        $mockHeaderCheck->method('checkIncomingContent')
+            ->willReturn(false);
+
+        $mockParameterCheck = $this->createMock(ParameterCheck::class);
+        $mockParameterCheck->expects($this->never())
+            ->method('checkParams');
+
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->method('checkSecurity')
+            ->willReturn(true);
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
+        $reflectedHeaderCheck->setAccessible(true);
+        $reflectedParameterCheck = $reflectedValidation->getProperty('parameterCheck');
+        $reflectedParameterCheck->setAccessible(true);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
+
+        $validation = $this->getMockBuilder(Validation::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkScheme',
+                'log',
+            ])
+            ->getMock();
+        $validation->method('checkScheme')
+            ->willReturn(true);
+        $validation->expects($this->never())
+            ->method('log');
+
+        $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedParameterCheck->setValue($validation, $mockParameterCheck);
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
+
+        $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
+    }
+
+    public function testInvokeChecksRequestParameters()
+    {
+        $params = [
+            'some params'
+        ];
+
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->expects($this->once())
+            ->method('getParams')
+            ->willReturn($params);
+        $mockSwagger->method('getProduces')
+            ->willReturn([]);
+        $mockSwagger->method('getSchemes')
+            ->willReturn([]);
+        $mockSwagger->method('getSecurity')
+            ->willReturn([]);
+
+        $mockRequest = $this->createMock(ServerRequestInterface::class);
+        $mockRequest->expects($this->any())
+            ->method('getAttribute')
+            ->with('swagger')
+            ->willReturn($mockSwagger);
+
+        $mockResponse = $this->createMock(ResponseInterface::class);
+
+        $mockCallable = function ($request, $response) {
+            return $response;
+        };
+
+        $mockHeaderCheck = $this->createMock(HeaderCheck::class);
+        $mockHeaderCheck->method('checkIncomingContent')
+            ->willReturn(true);
+        $mockHeaderCheck->method('checkOutgoingContent')
+            ->willReturn(true);
+        $mockHeaderCheck->method('checkAcceptHeader')
+            ->willReturn(true);
+
+        $mockParameterCheck = $this->createMock(ParameterCheck::class);
+        $mockParameterCheck->expects($this->once())
+            ->method('checkParams')
+            ->with($mockRequest, $params)
+            ->willReturn(true);
+
+        $mockSecurityCheck = $this->createMock(SecurityCheck::class);
+        $mockSecurityCheck->method('checkSecurity')
+            ->willReturn(true);
+
+        $reflectedValidation = new ReflectionClass(Validation::class);
+        $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
+        $reflectedHeaderCheck->setAccessible(true);
+        $reflectedParameterCheck = $reflectedValidation->getProperty('parameterCheck');
+        $reflectedParameterCheck->setAccessible(true);
+        $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
+        $reflectedSecurityCheck->setAccessible(true);
+
+        $validation = $this->getMockBuilder(Validation::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkScheme',
+                'log',
+            ])
+            ->getMock();
+        $validation->method('checkScheme')
+            ->willReturn(true);
+        $validation->expects($this->never())
+            ->method('log');
+
+        $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedParameterCheck->setValue($validation, $mockParameterCheck);
+        $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
+
+        $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
+
+        $this->assertSame($mockResponse, $result);
+    }
+
+    /**
+     * @expectedException AvalancheDevelopment\Peel\HttpError\BadRequest
+     * @expectedExceptionMessage Bad parameters passed in request
+     */
+    public function testInvokeBailsIfParameterCheckFails()
+    {
+        $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
+        $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->expects($this->once())
+            ->method('getParams')
             ->willReturn([]);
         $mockSwagger->expects($this->never())
             ->method('getProduces');
@@ -440,6 +629,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
         $mockHeaderCheck = $this->createMock(HeaderCheck::class);
         $mockHeaderCheck->method('checkIncomingContent')
+            ->willReturn(true);
+
+        $mockParameterCheck = $this->createMock(ParameterCheck::class);
+        $mockParameterCheck->method('checkParams')
             ->willReturn(false);
 
         $mockSecurityCheck = $this->createMock(SecurityCheck::class);
@@ -449,6 +642,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedParameterCheck = $reflectedValidation->getProperty('parameterCheck');
+        $reflectedParameterCheck->setAccessible(true);
         $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
         $reflectedSecurityCheck->setAccessible(true);
 
@@ -465,6 +660,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedParameterCheck->setValue($validation, $mockParameterCheck);
         $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
@@ -474,6 +670,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
     {
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->method('getParams')
             ->willReturn([]);
         $mockSwagger->method('getProduces')
             ->willReturn([]);
@@ -503,6 +701,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkAcceptHeader')
             ->willReturn(true);
 
+        $mockParameterCheck = $this->createMock(ParameterCheck::class);
+        $mockParameterCheck->method('checkParams')
+            ->willReturn(true);
+
         $mockSecurityCheck = $this->createMock(SecurityCheck::class);
         $mockSecurityCheck->method('checkSecurity')
             ->willReturn(true);
@@ -510,6 +712,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedParameterCheck = $reflectedValidation->getProperty('parameterCheck');
+        $reflectedParameterCheck->setAccessible(true);
         $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
         $reflectedSecurityCheck->setAccessible(true);
 
@@ -526,6 +730,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedParameterCheck->setValue($validation, $mockParameterCheck);
         $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
@@ -541,6 +746,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->method('getParams')
             ->willReturn([]);
         $mockSwagger->expects($this->once())
             ->method('getProduces')
@@ -572,6 +779,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkAcceptHeader')
             ->willReturn(true);
 
+        $mockParameterCheck = $this->createMock(ParameterCheck::class);
+        $mockParameterCheck->method('checkParams')
+            ->willReturn(true);
+
         $mockSecurityCheck = $this->createMock(SecurityCheck::class);
         $mockSecurityCheck->method('checkSecurity')
             ->willReturn(true);
@@ -579,6 +790,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedParameterCheck = $reflectedValidation->getProperty('parameterCheck');
+        $reflectedParameterCheck->setAccessible(true);
         $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
         $reflectedSecurityCheck->setAccessible(true);
 
@@ -595,6 +808,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedParameterCheck->setValue($validation, $mockParameterCheck);
         $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
@@ -611,8 +825,12 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->method('getConsumes')
             ->willReturn([]);
+        $mockSwagger->method('getParams')
+            ->willReturn([]);
         $mockSwagger->expects($this->once())
             ->method('getProduces')
+            ->willReturn([]);
+        $mockSwagger->method('getParams')
             ->willReturn([]);
         $mockSwagger->method('getSchemes')
             ->willReturn([]);
@@ -639,6 +857,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->expects($this->never())
             ->method('checkAcceptHeader');
 
+        $mockParameterCheck = $this->createMock(ParameterCheck::class);
+        $mockParameterCheck->method('checkParams')
+            ->willReturn(true);
+
         $mockSecurityCheck = $this->createMock(SecurityCheck::class);
         $mockSecurityCheck->method('checkSecurity')
             ->willReturn(true);
@@ -646,6 +868,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedParameterCheck = $reflectedValidation->getProperty('parameterCheck');
+        $reflectedParameterCheck->setAccessible(true);
         $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
         $reflectedSecurityCheck->setAccessible(true);
 
@@ -662,6 +886,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedParameterCheck->setValue($validation, $mockParameterCheck);
         $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
@@ -671,6 +896,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
     {
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->method('getParams')
             ->willReturn([]);
         $mockSwagger->method('getProduces')
             ->willReturn([]);
@@ -701,6 +928,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->with($mockRequest, $mockResponse)
             ->willReturn(true);
 
+        $mockParameterCheck = $this->createMock(ParameterCheck::class);
+        $mockParameterCheck->method('checkParams')
+            ->willReturn(true);
+
         $mockSecurityCheck = $this->createMock(SecurityCheck::class);
         $mockSecurityCheck->method('checkSecurity')
             ->willReturn(true);
@@ -708,6 +939,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedParameterCheck = $reflectedValidation->getProperty('parameterCheck');
+        $reflectedParameterCheck->setAccessible(true);
         $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
         $reflectedSecurityCheck->setAccessible(true);
 
@@ -724,6 +957,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedParameterCheck->setValue($validation, $mockParameterCheck);
         $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $result = $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
@@ -739,6 +973,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
     {
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->method('getConsumes')
+            ->willReturn([]);
+        $mockSwagger->method('getParams')
             ->willReturn([]);
         $mockSwagger->method('getProduces')
             ->willReturn([]);
@@ -767,6 +1003,10 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkAcceptHeader')
             ->willReturn(false);
 
+        $mockParameterCheck = $this->createMock(ParameterCheck::class);
+        $mockParameterCheck->method('checkParams')
+            ->willReturn(true);
+
         $mockSecurityCheck = $this->createMock(SecurityCheck::class);
         $mockSecurityCheck->method('checkSecurity')
             ->willReturn(true);
@@ -774,6 +1014,8 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedHeaderCheck = $reflectedValidation->getProperty('headerCheck');
         $reflectedHeaderCheck->setAccessible(true);
+        $reflectedParameterCheck = $reflectedValidation->getProperty('parameterCheck');
+        $reflectedParameterCheck->setAccessible(true);
         $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
         $reflectedSecurityCheck->setAccessible(true);
 
@@ -790,6 +1032,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->method('log');
 
         $reflectedHeaderCheck->setValue($validation, $mockHeaderCheck);
+        $reflectedParameterCheck->setValue($validation, $mockParameterCheck);
         $reflectedSecurityCheck->setValue($validation, $mockSecurityCheck);
 
         $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
