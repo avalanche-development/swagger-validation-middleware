@@ -297,4 +297,47 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($result);
     }
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Invalid location set for parameter
+     */
+    public function testCheckParamThrowsErrorIfUnrecognizedLocation()
+    {
+        $mockParam = [
+            'in' => 'invalid',
+        ];
+
+        $mockRequest = $this->createMock(RequestInterface::class);
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckParam = $reflectedParameterCheck->getMethod('checkParam');
+        $reflectedCheckParam->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkBodyParam',
+                'checkFormParam',
+                'checkHeaderParam',
+                'checkPathParam',
+                'checkQueryParam',
+            ])
+            ->getMock();
+        $parameterCheck->expects($this->never())
+            ->method('checkBodyParam');
+        $parameterCheck->expects($this->never())
+            ->method('checkFormParam');
+        $parameterCheck->expects($this->never())
+            ->method('checkHeaderParam');
+        $parameterCheck->expects($this->never())
+            ->method('checkPathParam');
+        $parameterCheck->expects($this->never())
+            ->method('checkQueryParam');
+
+        $reflectedCheckParam->invokeArgs($parameterCheck, [
+            $mockRequest,
+            $mockParam,
+        ]);
+    }
 }

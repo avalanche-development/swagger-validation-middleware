@@ -61,7 +61,7 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
-    protected function checkBodyParam(RequestInterface $request)
+    protected function checkBodyParam(RequestInterface $request, array $param)
     {
         return true;
     }
@@ -71,7 +71,7 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
-    protected function checkFormParam(RequestInterface $request)
+    protected function checkFormParam(RequestInterface $request, array $param)
     {
         return true;
     }
@@ -81,7 +81,7 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
-    protected function checkHeaderParam(RequestInterface $request)
+    protected function checkHeaderParam(RequestInterface $request, array $param)
     {
         return true;
     }
@@ -91,7 +91,7 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
-    protected function checkPathParam(RequestInterface $request)
+    protected function checkPathParam(RequestInterface $request, array $param)
     {
         return true;
     }
@@ -101,7 +101,7 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
-    protected function checkQueryParam(RequestInterface $request)
+    protected function checkQueryParam(RequestInterface $request, array $param)
     {
         return true;
     }
