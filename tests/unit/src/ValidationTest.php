@@ -2,7 +2,9 @@
 
 namespace AvalancheDevelopment\SwaggerValidationMiddleware;
 
+use AvalancheDevelopment\Peel\HttpError;
 use AvalancheDevelopment\SwaggerRouterMiddleware\ParsedSwaggerInterface;
+use Exception;
 use PHPUnit_Framework_TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -308,12 +310,11 @@ class ValidationTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException AvalancheDevelopment\Peel\HttpError\NotFound
-     * @expectedExceptionMessage Unallowed scheme (http) in request
+     * @expectedException Exception
      */
     public function testInvokeBailsIfUnacceptableSchemeInRequest()
     {
-        $mockException = new \Exception('Unallowed scheme (http) in request');
+        $mockException = $this->createMock(Exception::class);
 
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->expects($this->never())
@@ -1040,7 +1041,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $validation->__invoke($mockRequest, $mockResponse, $mockCallable);
     }
 
-    public function testCheckSchemeReturnsTrueIfRequestSchemeIsAllowed()
+    public function testCheckSchemeDoesNotThrowExceptionIfRequestSchemeIsAllowed()
     {
         $mockUri = $this->createMock(UriInterface::class);
         $mockUri->expects($this->once())
@@ -1062,16 +1063,14 @@ class ValidationTest extends PHPUnit_Framework_TestCase
             ->setMethods(null)
             ->getMock();
 
-        $result = $reflectedCheckScheme->invokeArgs($validation, [
+        $reflectedCheckScheme->invokeArgs($validation, [
             $mockRequest,
             $mockSchemes,
         ]);
-
-        $this->assertTrue($result);
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException AvalancheDevelopment\Peel\HttpError\NotFound
      * @expectedExceptionMessage Unallowed scheme (http) in request
      */
     public function testCheckSchemeThrowsExceptionIfRequestSchemeNotAllowed()

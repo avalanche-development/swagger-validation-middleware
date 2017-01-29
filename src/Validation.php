@@ -52,12 +52,7 @@ class Validation implements LoggerAwareInterface
         }
 
         $schemes = $request->getAttribute('swagger')->getSchemes();
-        try {
-            $this->checkScheme($request, $schemes);
-        } catch (\Exception $e) {
-            throw new HttpError\NotFound($e->getMessage());
-echo 'after throw';
-        }
+        $this->checkScheme($request, $schemes);
 
         $consumeHeaders = $request->getAttribute('swagger')->getConsumes();
         if (!$this->headerCheck->checkIncomingContent($request, $consumeHeaders)) {
@@ -87,15 +82,13 @@ echo 'after throw';
     /**
      * @param RequestInterface $request
      * @param array $schemes
-     * @return boolean
      */
     protected function checkScheme(RequestInterface $request, array $schemes)
     {
         $requestScheme = $request->getUri()->getScheme();
         if (!in_array($requestScheme, $schemes)) {
-            throw new \Exception("Unallowed scheme ({$requestScheme}) in request");
+            throw new HttpError\NotFound("Unallowed scheme ({$requestScheme}) in request");
         }
-        return true;
     }
 
     /**
