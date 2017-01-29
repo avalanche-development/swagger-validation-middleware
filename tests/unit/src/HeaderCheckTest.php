@@ -66,6 +66,40 @@ class HeaderCheckCheckTest extends PHPUnit_Framework_TestCase
         $headerCheck->checkIncomingContent($mockRequest, $consumeTypes);
     }
 
+    /**
+     * @expectedException AvalancheDevelopment\Peel\HttpError\NotAcceptable
+     * @expectedExceptionMessage Unacceptable header was passed into this endpoint
+     */
+    public function testCheckIncomingContentThrowsExceptionIfCheckerFails()
+    {
+        $consumeTypes = [
+            'application/vnd.github+json',
+            'application/json',
+        ];
+
+        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream->expects($this->once())
+            ->method('getSize')
+            ->willReturn(1);
+
+        $mockRequest = $this->createMock(RequestInterface::class);
+        $mockRequest->method('getBody')
+            ->willReturn($mockStream);
+
+        $headerCheck = $this->getMockBuilder(HeaderCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkMessageContent'
+            ])
+            ->getMock();
+        $headerCheck->expects($this->once())
+            ->method('checkMessageContent')
+            ->with($mockRequest, $consumeTypes)
+            ->willReturn(false);
+
+        $headerCheck->checkIncomingContent($mockRequest, $consumeTypes);
+    }
+
     public function testCheckOutgoingContentSkipsCheckIfEmptyHeader()
     {
         $mockResponse = $this->createMock(ResponseInterface::class);
@@ -114,6 +148,38 @@ class HeaderCheckCheckTest extends PHPUnit_Framework_TestCase
         $headerCheck->checkOutgoingContent($mockResponse, $produceTypes);
     }
 
+    /**
+     * @expectedException AvalancheDevelopment\Peel\HttpError\InternalServerError
+     * @expectedExceptionMessage Invalid content detected
+     */
+    public function testCheckOutgoingContentThrowExceptionIfCheckerFails()
+    {
+        $produceTypes = [
+            'application/json',
+        ];
+
+        $mockResponse = $this->createMock(ResponseInterface::class);
+        $mockResponse->expects($this->once())
+            ->method('getHeader')
+            ->with('content-type')
+            ->willReturn([
+                'some value',
+            ]);
+
+        $headerCheck = $this->getMockBuilder(HeaderCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkMessageContent'
+            ])
+            ->getMock();
+        $headerCheck->expects($this->once())
+            ->method('checkMessageContent')
+            ->with($mockResponse, $produceTypes)
+            ->willReturn(false);
+
+        $headerCheck->checkOutgoingContent($mockResponse, $produceTypes);
+    }
+
     public function testCheckAcceptHeaderSkipsCheckIfEmptyHeader()
     {
         $mockRequest = $this->createMock(RequestInterface::class);
@@ -136,7 +202,7 @@ class HeaderCheckCheckTest extends PHPUnit_Framework_TestCase
         $headerCheck->checkAcceptHeader($mockRequest, $mockResponse);
     }
 
-    public function testCheckAcceptHeaderPassesOnCheckerIfContainsHeaders()
+    public function testCheckAcceptHeaderPassesOntoCheckerIfContainsHeaders()
     {
         $expectTypes = [
             'application/json',
@@ -160,6 +226,38 @@ class HeaderCheckCheckTest extends PHPUnit_Framework_TestCase
             ->method('checkMessageContent')
             ->with($mockResponse, $expectTypes)
             ->willReturn(true);
+
+        $headerCheck->checkAcceptHeader($mockRequest, $mockResponse);
+    }
+
+    /**
+     * @expectedException AvalancheDevelopment\Peel\HttpError\NotAcceptable
+     * @expectedExceptionMessage Unacceptable content detected
+     */
+    public function testCheckAcceptHeaderThrowsExceptionIfCheckerFails()
+    {
+        $expectTypes = [
+            'application/json',
+        ];
+
+        $mockRequest = $this->createMock(RequestInterface::class);
+        $mockRequest->expects($this->exactly(2))
+            ->method('getHeader')
+            ->with('accept')
+            ->willReturn($expectTypes);
+
+        $mockResponse = $this->createMock(ResponseInterface::class);
+
+        $headerCheck = $this->getMockBuilder(HeaderCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkMessageContent'
+            ])
+            ->getMock();
+        $headerCheck->expects($this->once())
+            ->method('checkMessageContent')
+            ->with($mockResponse, $expectTypes)
+            ->willReturn(false);
 
         $headerCheck->checkAcceptHeader($mockRequest, $mockResponse);
     }
