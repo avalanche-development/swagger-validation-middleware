@@ -39,7 +39,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $parameterCheck->checkParams($mockRequest, $mockParams);
     }
 
-    public function testCheckParamsReturnsTrueIfAllParamsAreValid()
+    public function testCheckParamsDoesNotThrowExceptionIfAllParamsAreValid()
     {
         $mockParams = [
             [ 'valid' ],
@@ -55,12 +55,14 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $parameterCheck->method('checkParam')
             ->willReturn(true);
 
-        $result = $parameterCheck->checkParams($mockRequest, $mockParams);
-
-        $this->assertTrue($result);
+        $parameterCheck->checkParams($mockRequest, $mockParams);
     }
 
-    public function testCheckParamsReturnsFalseIfOneParamReturnsFalse()
+    /**
+     * @expectedException AvalancheDevelopment\Peel\HttpError\BadRequest
+     * @expectedExceptionMessage Bad parameters passed in request
+     */
+    public function testCheckParamsThrowsExceptionIfOneParamReturnsFalse()
     {
         $mockParams = [
             [ 'valid' ],
@@ -78,9 +80,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
                 return current($param) === 'valid';
             }));
 
-        $result = $parameterCheck->checkParams($mockRequest, $mockParams);
-
-        $this->assertFalse($result);
+        $parameterCheck->checkParams($mockRequest, $mockParams);
     }
 
     public function testCheckParamChecksBodyIfBodyParam()

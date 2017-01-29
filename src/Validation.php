@@ -47,32 +47,22 @@ class Validation implements LoggerAwareInterface
         }
 
         $security = $request->getAttribute('swagger')->getSecurity();
-        if (!$this->securityCheck->checkSecurity($request, $security)) {
-            throw new HttpError\Unauthorized('Unacceptable security passed in request');
-        }
+        $this->securityCheck->checkSecurity($request, $security);
 
         $schemes = $request->getAttribute('swagger')->getSchemes();
         $this->checkScheme($request, $schemes);
 
         $consumeHeaders = $request->getAttribute('swagger')->getConsumes();
-        if (!$this->headerCheck->checkIncomingContent($request, $consumeHeaders)) {
-            throw new HttpError\NotAcceptable('Unacceptable header was passed into this endpoint');
-        }
+        $this->headerCheck->checkIncomingContent($request, $consumeHeaders);
 
         $params = $request->getAttribute('swagger')->getParams();
-        if (!$this->parameterCheck->checkParams($request, $params)) {
-            throw new HttpError\BadRequest('Bad parameters passed in request');
-        }
+        $this->parameterCheck->checkParams($request, $params);
 
         $result = $next($request, $response);
 
         $produceHeaders = $request->getAttribute('swagger')->getProduces();
-        if (!$this->headerCheck->checkOutgoingContent($result, $produceHeaders)) {
-            throw new HttpError\InternalServerError('Invalid content detected');
-        }
-        if (!$this->headerCheck->checkAcceptHeader($request, $result)) {
-            throw new HttpError\NotAcceptable('Unacceptable content detected');
-        }
+        $this->headerCheck->checkOutgoingContent($result, $produceHeaders);
+        $this->headerCheck->checkAcceptHeader($request, $result);
 
         // todo check response body
 

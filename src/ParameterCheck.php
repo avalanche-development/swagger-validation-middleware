@@ -2,6 +2,7 @@
 
 namespace AvalancheDevelopment\SwaggerValidationMiddleware;
 
+use AvalancheDevelopment\Peel\HttpError;
 use Psr\Http\Message\RequestInterface;
 
 class ParameterCheck
@@ -10,7 +11,6 @@ class ParameterCheck
     /**
      * @param RequestInterface $request
      * @param array $params
-     * @return boolean
      */
     public function checkParams(RequestInterface $request, array $params)
     {
@@ -22,7 +22,10 @@ class ParameterCheck
             },
             true
         );
-        return $isValid;
+
+        if (!$isValid) {
+            throw new HttpError\BadRequest('Bad parameters passed in request');
+        }
     }
 
     /**

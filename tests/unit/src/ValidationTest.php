@@ -175,11 +175,12 @@ class ValidationTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException AvalancheDevelopment\Peel\HttpError\Unauthorized
-     * @expectedExceptionMessage Unacceptable security passed in request
+     * @expectedException Exception
      */
     public function testInvokeBailsIfUnacceptableSecurityInRequest()
     {
+        $mockException = $this->createMock(Exception::class);
+
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->expects($this->never())
             ->method('getConsumes');
@@ -207,7 +208,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
         $mockSecurityCheck = $this->createMock(SecurityCheck::class);
         $mockSecurityCheck->method('checkSecurity')
-            ->willReturn(false);
+            ->will($this->throwException($mockException));
 
         $reflectedValidation = new ReflectionClass(Validation::class);
         $reflectedSecurityCheck = $reflectedValidation->getProperty('securityCheck');
@@ -452,11 +453,12 @@ class ValidationTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException AvalancheDevelopment\Peel\HttpError\NotAcceptable
-     * @expectedExceptionMessage Unacceptable header was passed into this endpoint
+     * @expectedException Exception
      */
     public function testInvokeBailsIfUnacceptableContentInRequest()
     {
+        $mockException = $this->createMock(Exception::class);
+
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->expects($this->once())
             ->method('getConsumes')
@@ -484,7 +486,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
         $mockHeaderCheck = $this->createMock(HeaderCheck::class);
         $mockHeaderCheck->method('checkIncomingContent')
-            ->willReturn(false);
+            ->will($this->throwException($mockException));
 
         $mockParameterCheck = $this->createMock(ParameterCheck::class);
         $mockParameterCheck->expects($this->never())
@@ -600,11 +602,12 @@ class ValidationTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException AvalancheDevelopment\Peel\HttpError\BadRequest
-     * @expectedExceptionMessage Bad parameters passed in request
+     * @expectedException Exception
      */
     public function testInvokeBailsIfParameterCheckFails()
     {
+        $mockException = $this->createMock(Exception::class);
+
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->method('getConsumes')
             ->willReturn([]);
@@ -636,7 +639,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
         $mockParameterCheck = $this->createMock(ParameterCheck::class);
         $mockParameterCheck->method('checkParams')
-            ->willReturn(false);
+            ->will($this->throwException($mockException));
 
         $mockSecurityCheck = $this->createMock(SecurityCheck::class);
         $mockSecurityCheck->method('checkSecurity')
@@ -820,11 +823,12 @@ class ValidationTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException AvalancheDevelopment\Peel\HttpError\InternalServerError
-     * @expectedExceptionMessage Invalid content detected
+     * @expectedException Exception
      */
     public function testInvokeBailsIfUnproducibleContentInResponse()
     {
+        $mockException = $this->createMock(Exception::class);
+
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->method('getConsumes')
             ->willReturn([]);
@@ -856,7 +860,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkIncomingContent')
             ->willReturn(true);
         $mockHeaderCheck->method('checkOutgoingContent')
-            ->willReturn(false);
+            ->will($this->throwException($mockException));
         $mockHeaderCheck->expects($this->never())
             ->method('checkAcceptHeader');
 
@@ -969,11 +973,12 @@ class ValidationTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException AvalancheDevelopment\Peel\HttpError\NotAcceptable
-     * @expectedExceptionMessage Unacceptable content detected
+     * @expectedException Exception
      */
     public function testInvokeBailsIfUnacceptableContentInResponse()
     {
+        $mockException = $this->createMock(Exception::class);
+
         $mockSwagger = $this->createMock(ParsedSwaggerInterface::class);
         $mockSwagger->method('getConsumes')
             ->willReturn([]);
@@ -1004,7 +1009,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockHeaderCheck->method('checkOutgoingContent')
             ->willReturn(true);
         $mockHeaderCheck->method('checkAcceptHeader')
-            ->willReturn(false);
+            ->will($this->throwException($mockException));
 
         $mockParameterCheck = $this->createMock(ParameterCheck::class);
         $mockParameterCheck->method('checkParams')

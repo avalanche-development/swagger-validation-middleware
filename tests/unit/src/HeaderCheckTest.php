@@ -12,7 +12,7 @@ use ReflectionClass;
 class HeaderCheckCheckTest extends PHPUnit_Framework_TestCase
 {
 
-    public function testCheckIncomingContentReturnsTrueIfEmptyBody()
+    public function testCheckIncomingContentSkipsCheckIfEmptyBody()
     {
         $mockStream = $this->createMock(StreamInterface::class);
         $mockStream->expects($this->once())
@@ -33,12 +33,10 @@ class HeaderCheckCheckTest extends PHPUnit_Framework_TestCase
         $headerCheck->expects($this->never())
             ->method('checkMessageContent');
 
-        $result = $headerCheck->checkIncomingContent($mockRequest, []);
-
-        $this->assertTrue($result);
+        $headerCheck->checkIncomingContent($mockRequest, []);
     }
 
-    public function testCheckIncomingContentPassesOnCheckerIfContainsBody()
+    public function testCheckIncomingContentPassesOntoCheckerIfContainsBody()
     {
         $consumeTypes = [
             'application/vnd.github+json',
@@ -65,12 +63,10 @@ class HeaderCheckCheckTest extends PHPUnit_Framework_TestCase
             ->with($mockRequest, $consumeTypes)
             ->willReturn(true);
 
-        $result = $headerCheck->checkIncomingContent($mockRequest, $consumeTypes);
-
-        $this->assertTrue($result);
+        $headerCheck->checkIncomingContent($mockRequest, $consumeTypes);
     }
 
-    public function testCheckOutgoingContentReturnsTrueIfEmptyHeader()
+    public function testCheckOutgoingContentSkipsCheckIfEmptyHeader()
     {
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockResponse->expects($this->once())
@@ -87,12 +83,10 @@ class HeaderCheckCheckTest extends PHPUnit_Framework_TestCase
         $headerCheck->expects($this->never())
             ->method('checkMessageContent');
 
-        $result = $headerCheck->checkOutgoingContent($mockResponse, []);
-
-        $this->assertTrue($result);
+        $headerCheck->checkOutgoingContent($mockResponse, []);
     }
 
-    public function testCheckOutgoingContentPassesOnCheckerIfContainsHeaders()
+    public function testCheckOutgoingContentPassesOntoCheckerIfContainsHeaders()
     {
         $produceTypes = [
             'application/json',
@@ -117,12 +111,10 @@ class HeaderCheckCheckTest extends PHPUnit_Framework_TestCase
             ->with($mockResponse, $produceTypes)
             ->willReturn(true);
 
-        $result = $headerCheck->checkOutgoingContent($mockResponse, $produceTypes);
-
-        $this->assertTrue($result);
+        $headerCheck->checkOutgoingContent($mockResponse, $produceTypes);
     }
 
-    public function testCheckAcceptHeaderReturnsTrueIfEmptyHeader()
+    public function testCheckAcceptHeaderSkipsCheckIfEmptyHeader()
     {
         $mockRequest = $this->createMock(RequestInterface::class);
         $mockRequest->expects($this->once())
@@ -141,9 +133,7 @@ class HeaderCheckCheckTest extends PHPUnit_Framework_TestCase
         $headerCheck->expects($this->never())
             ->method('checkMessageContent');
 
-        $result = $headerCheck->checkAcceptHeader($mockRequest, $mockResponse);
-
-        $this->assertTrue($result);
+        $headerCheck->checkAcceptHeader($mockRequest, $mockResponse);
     }
 
     public function testCheckAcceptHeaderPassesOnCheckerIfContainsHeaders()
@@ -171,9 +161,7 @@ class HeaderCheckCheckTest extends PHPUnit_Framework_TestCase
             ->with($mockResponse, $expectTypes)
             ->willReturn(true);
 
-        $result = $headerCheck->checkAcceptHeader($mockRequest, $mockResponse);
-
-        $this->assertTrue($result);
+        $headerCheck->checkAcceptHeader($mockRequest, $mockResponse);
     }
 
     public function testCheckMessageContentReturnsTrueIfPassed()

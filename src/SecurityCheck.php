@@ -2,6 +2,7 @@
 
 namespace AvalancheDevelopment\SwaggerValidationMiddleware;
 
+use AvalancheDevelopment\Peel\HttpError;
 use Psr\Http\Message\RequestInterface;
 
 class SecurityCheck
@@ -10,7 +11,6 @@ class SecurityCheck
     /**
      * @param RequestInterface $request
      * @param array $securitySchemes
-     * @return boolean
      */
     public function checkSecurity(RequestInterface $request, array $securitySchemes)
     {
@@ -21,7 +21,10 @@ class SecurityCheck
                 return $self->checkScheme($request, $scheme);
             }
         );
-        return count($metSecurity) > 0;
+
+        if (count($metSecurity) < 1) {
+            throw new HttpError\Unauthorized('Unacceptable security passed in request');
+        }
     }
 
     /**

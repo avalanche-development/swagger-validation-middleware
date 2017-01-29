@@ -33,12 +33,13 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
                     $mockRequest,
                     $mockSecurity[1],
                 ]
-            );
+            )
+            ->willReturn(true);
 
         $securityCheck->checkSecurity($mockRequest, $mockSecurity);
     }
 
-    public function testCheckSecurityReturnsTrueIfSecurityCheckReturnsTrueForAtLeastOneScheme()
+    public function testCheckSecurityDoesNotThrowExceptionIfSecurityCheckReturnsTrueForAtLeastOneScheme()
     {
         $mockSecurity = [
             [ 'valid' ],
@@ -56,12 +57,14 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
                 return current($scheme) === 'valid';
             }));
 
-        $result = $securityCheck->checkSecurity($mockRequest, $mockSecurity);
-
-        $this->assertTrue($result);
+        $securityCheck->checkSecurity($mockRequest, $mockSecurity);
     }
 
-    public function testCheckSecurityReturnsFalseIfSecurityCheckReturnsFalseForAllSchemes()
+    /**
+     * @expectedException AvalancheDevelopment\Peel\HttpError\Unauthorized
+     * @expectedExceptionMessage Unacceptable security passed in request
+     */
+    public function testCheckSecurityThrowExceptionIfSecurityCheckReturnsFalseForAllSchemes()
     {
         $mockSecurity = [
             [ 'invalid' ],
@@ -76,9 +79,7 @@ class SecurityCheckTest extends PHPUnit_Framework_TestCase
         $securityCheck->method('checkScheme')
             ->willReturn(false);
 
-        $result = $securityCheck->checkSecurity($mockRequest, $mockSecurity);
-
-        $this->assertFalse($result);
+        $securityCheck->checkSecurity($mockRequest, $mockSecurity);
     }
 
     public function testCheckSchemeUsesBasicCheckIfBasicType()

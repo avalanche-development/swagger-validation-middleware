@@ -2,6 +2,7 @@
 
 namespace AvalancheDevelopment\SwaggerValidationMiddleware;
 
+use AvalancheDevelopment\Peel\HttpError;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -12,44 +13,47 @@ class HeaderCheck
     /**
      * @param RequestInterface $request
      * @param array $consumeTypes
-     * @return boolean
      */
     public function checkIncomingContent(RequestInterface $request, array $consumeTypes)
     {
         if (!$request->getBody()->getSize()) {
-            return true;
+            return;
         }
 
-        return $this->checkMessageContent($request, $consumeTypes);
+        if (!$this->checkMessageContent($request, $consumeTypes)) {
+            throw new HttpError\NotAcceptable('Unacceptable header was passed into this endpoint');
+        }
     }
 
     /**
      * @param ResponseInterface $response
      * @param array $produceTypes
-     * @return Response
      */
     public function checkOutgoingContent(ResponseInterface $response, array $produceTypes)
     {
         if (empty($response->getHeader('content-type'))) {
-            return true;
+            return;
         }
 
-        return $this->checkMessageContent($response, $produceTypes);
+        if (!$this->checkMessageContent($response, $produceTypes)) {
+            throw new HttpError\InternalServerError('Invalid content detected');
+        }
     }
 
     /**
      * @param RequestInterface $request
      * @param ResponseInterface $response
-     * @return boolean
      */
     public function checkAcceptHeader(RequestInterface $request, ResponseInterface $response)
     {
         if (empty($request->getHeader('accept'))) {
-            return true;
+            return;
         }
 
         $acceptTypes = $request->getHeader('accept');
-        return $this->checkMessageContent($response, $acceptTypes);
+        if (!$this->checkMessageContent($response, $acceptTypes)) {
+            throw new HttpError\NotAcceptable('Unacceptable content detected');
+        }
     }
 
     /**
