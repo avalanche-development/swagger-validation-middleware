@@ -3,22 +3,20 @@
 namespace AvalancheDevelopment\SwaggerValidationMiddleware;
 
 use AvalancheDevelopment\Peel\HttpError;
-use Psr\Http\Message\RequestInterface;
 
 class ParameterCheck
 {
 
     /**
-     * @param RequestInterface $request
      * @param array $params
      */
-    public function checkParams(RequestInterface $request, array $params)
+    public function checkParams(array $params)
     {
         $self = $this;
         $isValid = array_reduce(
             $params,
-            function ($result, $param) use ($self, $request) {
-                return ($self->checkParam($request, $param) && $result);
+            function ($result, $param) use ($self) {
+                return ($self->checkParam($param) && $result);
             },
             true
         );
@@ -29,27 +27,26 @@ class ParameterCheck
     }
 
     /**
-     * @param RequestInterface $request
      * @param array $param
      * @return boolean
      */
-    protected function checkParam(RequestInterface $request, array $param)
+    protected function checkParam(array $param)
     {
         switch ($param['in']) {
             case 'body':
-                $result = $this->checkBodyParam($request, $param);
+                $result = $this->checkBodyParam($param);
                 break;
             case 'formData':
-                $result = $this->checkFormParam($request, $param);
+                $result = $this->checkFormParam($param);
                 break;
             case 'header':
-                $result = $this->checkHeaderParam($request, $param);
+                $result = $this->checkHeaderParam($param);
                 break;
             case 'path':
-                $result = $this->checkPathParam($request, $param);
+                $result = $this->checkPathParam($param);
                 break;
             case 'query':
-                $result = $this->checkQueryParam($request, $param);
+                $result = $this->checkQueryParam($param);
                 break;
             default:
                 throw new \Exception('Invalid location set for parameter');
@@ -60,51 +57,46 @@ class ParameterCheck
     }
 
     /**
-     * @param RequestInterface $request
      * @param array $param
      * @return boolean
      */
-    protected function checkBodyParam(RequestInterface $request, array $param)
+    protected function checkBodyParam(array $param)
     {
         return true;
     }
 
     /**
-     * @param RequestInterface $request
      * @param array $param
      * @return boolean
      */
-    protected function checkFormParam(RequestInterface $request, array $param)
+    protected function checkFormParam(array $param)
     {
         return true;
     }
 
     /**
-     * @param RequestInterface $request
      * @param array $param
      * @return boolean
      */
-    protected function checkHeaderParam(RequestInterface $request, array $param)
+    protected function checkHeaderParam(array $param)
     {
         return true;
     }
 
     /**
-     * @param RequestInterface $request
      * @param array $param
      * @return boolean
      */
-    protected function checkPathParam(RequestInterface $request, array $param)
+    protected function checkPathParam(array $param)
     {
         return true;
     }
 
     /**
-     * @param RequestInterface $request
      * @param array $param
      * @return boolean
      */
-    protected function checkQueryParam(RequestInterface $request, array $param)
+    protected function checkQueryParam(array $param)
     {
         return true;
     }

@@ -565,7 +565,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
         $mockParameterCheck = $this->createMock(ParameterCheck::class);
         $mockParameterCheck->expects($this->once())
             ->method('checkParams')
-            ->with($mockRequest, $params)
+            ->with($params)
             ->willReturn(true);
 
         $mockSecurityCheck = $this->createMock(SecurityCheck::class);

@@ -3,7 +3,6 @@
 namespace AvalancheDevelopment\SwaggerValidationMiddleware;
 
 use PHPUnit_Framework_TestCase;
-use Psr\Http\Message\RequestInterface;
 use ReflectionClass;
 
 class ParameterCheckTest extends PHPUnit_Framework_TestCase
@@ -16,8 +15,6 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             [ 'two' ],
         ];
 
-        $mockRequest = $this->createMock(RequestInterface::class);
-
         $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
             ->disableOriginalConstructor()
             ->setMethods([ 'checkParam' ])
@@ -25,18 +22,12 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $parameterCheck->expects($this->exactly(count($mockParams)))
             ->method('checkParam')
             ->withConsecutive(
-                [
-                    $mockRequest,
-                    $mockParams[0],
-                ],
-                [
-                    $mockRequest,
-                    $mockParams[1],
-                ]
+                [ $mockParams[0] ],
+                [ $mockParams[1] ]
             )
             ->willReturn(true);
 
-        $parameterCheck->checkParams($mockRequest, $mockParams);
+        $parameterCheck->checkParams($mockParams);
     }
 
     public function testCheckParamsDoesNotThrowExceptionIfAllParamsAreValid()
@@ -46,8 +37,6 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             [ 'valid' ],
         ];
 
-        $mockRequest = $this->createMock(RequestInterface::class);
-
         $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
             ->disableOriginalConstructor()
             ->setMethods([ 'checkParam' ])
@@ -55,7 +44,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $parameterCheck->method('checkParam')
             ->willReturn(true);
 
-        $parameterCheck->checkParams($mockRequest, $mockParams);
+        $parameterCheck->checkParams($mockParams);
     }
 
     /**
@@ -69,18 +58,16 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             [ 'invalid' ],
         ];
 
-        $mockRequest = $this->createMock(RequestInterface::class);
-
         $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
             ->disableOriginalConstructor()
             ->setMethods([ 'checkParam' ])
             ->getMock();
         $parameterCheck->method('checkParam')
-            ->will($this->returnCallback(function ($mockRequest, $param) {
+            ->will($this->returnCallback(function ($param) {
                 return current($param) === 'valid';
             }));
 
-        $parameterCheck->checkParams($mockRequest, $mockParams);
+        $parameterCheck->checkParams($mockParams);
     }
 
     public function testCheckParamChecksBodyIfBodyParam()
@@ -88,8 +75,6 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $mockParam = [
             'in' => 'body',
         ];
-
-        $mockRequest = $this->createMock(RequestInterface::class);
 
         $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
         $reflectedCheckParam = $reflectedParameterCheck->getMethod('checkParam');
@@ -107,7 +92,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->getMock();
         $parameterCheck->expects($this->once())
             ->method('checkBodyParam')
-            ->with($mockRequest, $mockParam)
+            ->with($mockParam)
             ->willReturn(true);
         $parameterCheck->expects($this->never())
             ->method('checkFormParam');
@@ -118,10 +103,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $parameterCheck->expects($this->never())
             ->method('checkQueryParam');
 
-        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [
-            $mockRequest,
-            $mockParam,
-        ]);
+        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
 
         $this->assertTrue($result);
     }
@@ -131,8 +113,6 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $mockParam = [
             'in' => 'formData',
         ];
-
-        $mockRequest = $this->createMock(RequestInterface::class);
 
         $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
         $reflectedCheckParam = $reflectedParameterCheck->getMethod('checkParam');
@@ -152,7 +132,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->method('checkBodyParam');
         $parameterCheck->expects($this->once())
             ->method('checkFormParam')
-            ->with($mockRequest, $mockParam)
+            ->with($mockParam)
             ->willReturn(true);
         $parameterCheck->expects($this->never())
             ->method('checkHeaderParam');
@@ -161,10 +141,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $parameterCheck->expects($this->never())
             ->method('checkQueryParam');
 
-        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [
-            $mockRequest,
-            $mockParam,
-        ]);
+        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
 
         $this->assertTrue($result);
     }
@@ -174,8 +151,6 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $mockParam = [
             'in' => 'header',
         ];
-
-        $mockRequest = $this->createMock(RequestInterface::class);
 
         $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
         $reflectedCheckParam = $reflectedParameterCheck->getMethod('checkParam');
@@ -197,17 +172,14 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->method('checkFormParam');
         $parameterCheck->expects($this->once())
             ->method('checkHeaderParam')
-            ->with($mockRequest, $mockParam)
+            ->with($mockParam)
             ->willReturn(true);
         $parameterCheck->expects($this->never())
             ->method('checkPathParam');
         $parameterCheck->expects($this->never())
             ->method('checkQueryParam');
 
-        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [
-            $mockRequest,
-            $mockParam,
-        ]);
+        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
 
         $this->assertTrue($result);
     }
@@ -217,8 +189,6 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $mockParam = [
             'in' => 'path',
         ];
-
-        $mockRequest = $this->createMock(RequestInterface::class);
 
         $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
         $reflectedCheckParam = $reflectedParameterCheck->getMethod('checkParam');
@@ -242,15 +212,12 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->method('checkHeaderParam');
         $parameterCheck->expects($this->once())
             ->method('checkPathParam')
-            ->with($mockRequest, $mockParam)
+            ->with($mockParam)
             ->willReturn(true);
         $parameterCheck->expects($this->never())
             ->method('checkQueryParam');
 
-        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [
-            $mockRequest,
-            $mockParam,
-        ]);
+        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
 
         $this->assertTrue($result);
     }
@@ -260,8 +227,6 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $mockParam = [
             'in' => 'query',
         ];
-
-        $mockRequest = $this->createMock(RequestInterface::class);
 
         $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
         $reflectedCheckParam = $reflectedParameterCheck->getMethod('checkParam');
@@ -287,13 +252,10 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->method('checkPathParam');
         $parameterCheck->expects($this->once())
             ->method('checkQueryParam')
-            ->with($mockRequest, $mockParam)
+            ->with($mockParam)
             ->willReturn(true);
 
-        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [
-            $mockRequest,
-            $mockParam,
-        ]);
+        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
 
         $this->assertTrue($result);
     }
@@ -307,8 +269,6 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $mockParam = [
             'in' => 'invalid',
         ];
-
-        $mockRequest = $this->createMock(RequestInterface::class);
 
         $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
         $reflectedCheckParam = $reflectedParameterCheck->getMethod('checkParam');
@@ -335,9 +295,6 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $parameterCheck->expects($this->never())
             ->method('checkQueryParam');
 
-        $reflectedCheckParam->invokeArgs($parameterCheck, [
-            $mockRequest,
-            $mockParam,
-        ]);
+        $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 }

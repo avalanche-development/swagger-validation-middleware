@@ -56,7 +56,7 @@ class Validation implements LoggerAwareInterface
         $this->headerCheck->checkIncomingContent($request, $consumeHeaders);
 
         $params = $request->getAttribute('swagger')->getParams();
-        $this->parameterCheck->checkParams($request, $params);
+        $this->parameterCheck->checkParams($params);
 
         $result = $next($request, $response);
 
