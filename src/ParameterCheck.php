@@ -32,6 +32,10 @@ class ParameterCheck
      */
     protected function checkParam(array $param)
     {
+        if (!$this->checkRequired($param)) {
+            return false;
+        }
+
         switch ($param['in']) {
             case 'body':
                 $result = $this->checkBodyParam($param);
@@ -54,6 +58,15 @@ class ParameterCheck
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $param
+     * @return boolean
+     */
+    protected function checkRequired(array $param)
+    {
+        return true;
     }
 
     /**
