@@ -66,7 +66,11 @@ class ParameterCheck
      */
     protected function checkRequired(array $param)
     {
-        return true;
+        if (!isset($param['required']) || $param['required'] === false) {
+            return true;
+        }
+
+        return isset($param['value']);
     }
 
     /**

@@ -356,4 +356,74 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
 
         $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
     }
+
+    public function testCheckRequiredIgnoresUnsetRequiredSetting()
+    {
+        $mockParam = [];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckRequired = $reflectedParameterCheck->getMethod('checkRequired');
+        $reflectedCheckRequired->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckRequired->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCheckRequiredIgnoresNonrequiredParam()
+    {
+        $mockParam = [
+            'required' => false,
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckRequired = $reflectedParameterCheck->getMethod('checkRequired');
+        $reflectedCheckRequired->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckRequired->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @dataProvider checkRequiredParamsProvider
+     */
+    public function testCheckRequiredReturnsBasedOnParamSet($param, $expected)
+    {
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckRequired = $reflectedParameterCheck->getMethod('checkRequired');
+        $reflectedCheckRequired->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckRequired->invokeArgs($parameterCheck, [ $param ]);
+        
+        $this->assertSame(
+            $expected,
+            $result,
+            'Expected ' . json_encode($param) . ' to be ' . ($expected ? 'true' : 'false')
+        );
+    }
+
+    public function checkRequiredParamsProvider()
+    {
+        return [
+            [ [ 'required' => true ], false ],
+            [ [ 'required' => true, 'value' => '' ], true ],
+            [ [ 'required' => false, 'value' => null ], true ],
+            [ [ 'required' => true, 'value' => null ], false ],
+            [ [ 'required' => true, 'value' => 'puppies' ], true ],
+            [ [ 'required' => true, 'value' => 0 ], true ],
+        ];
+    }
 }
