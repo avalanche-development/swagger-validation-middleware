@@ -36,28 +36,48 @@ class ParameterCheck
             return false;
         }
 
-        switch ($param['in']) {
-            case 'body':
-                $result = $this->checkBodyParam($param);
-                break;
-            case 'formData':
-                $result = $this->checkFormParam($param);
-                break;
-            case 'header':
-                $result = $this->checkHeaderParam($param);
-                break;
-            case 'path':
-                $result = $this->checkPathParam($param);
-                break;
-            case 'query':
-                $result = $this->checkQueryParam($param);
-                break;
-            default:
-                throw new \Exception('Invalid location set for parameter');
-                break;
+        if ($param['in'] === 'body') {
+            return $this->checkBodySchema($param);
         }
 
-        return $result;
+        return $this->checkParamValue($param);
+    }
+
+    /**
+     * @param array $param
+     * @return boolean
+     */
+    protected function checkParamValue(array $param)
+    {
+        if ($param['type'] === 'array') {
+            if (!$this->checkItems($param)) {
+                return false;
+            }
+
+            $self = $this;
+            return array_reduce(
+                $param['items'],
+                function ($result, $item) use ($self) {
+                    return ($self->checkParamValue($item) && $result);
+                },
+                true
+            );
+        }
+
+        if (!$this->checkFormat($param)) {
+            return false;
+        }
+        if ($param['type'] === 'number' && !$this->checkRange($param)) {
+            return false;
+        }
+        if ($param['type'] === 'string' && !$this->checkLength($param)) {
+            return false;
+        }
+        if ($param['type'] === 'string' && !$this->checkPattern($param)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -77,7 +97,7 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
-    protected function checkBodyParam(array $param)
+    protected function checkItems(array $param)
     {
         return true;
     }
@@ -86,7 +106,7 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
-    protected function checkFormParam(array $param)
+    protected function checkFormat(array $param)
     {
         return true;
     }
@@ -95,7 +115,7 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
-    protected function checkHeaderParam(array $param)
+    protected function checkRange(array $param)
     {
         return true;
     }
@@ -104,7 +124,7 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
-    protected function checkPathParam(array $param)
+    protected function checkLength(array $param)
     {
         return true;
     }
@@ -113,7 +133,7 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
-    protected function checkQueryParam(array $param)
+    protected function checkPattern(array $param)
     {
         return true;
     }
