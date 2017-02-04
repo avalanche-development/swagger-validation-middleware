@@ -47,6 +47,19 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
+    protected function checkRequired(array $param)
+    {
+        if (!isset($param['required']) || $param['required'] === false) {
+            return true;
+        }
+
+        return isset($param['value']);
+    }
+
+    /**
+     * @param array $param
+     * @return boolean
+     */
     protected function checkParamValue(array $param)
     {
         if ($param['type'] === 'array') {
@@ -78,19 +91,6 @@ class ParameterCheck
         }
 
         return true;
-    }
-
-    /**
-     * @param array $param
-     * @return boolean
-     */
-    protected function checkRequired(array $param)
-    {
-        if (!isset($param['required']) || $param['required'] === false) {
-            return true;
-        }
-
-        return isset($param['value']);
     }
 
     /**
