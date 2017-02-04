@@ -126,6 +126,23 @@ class ParameterCheck
      */
     protected function checkLength(array $param)
     {
+        if (strlen($param['value']) < 1) {
+            return true;
+        }
+
+        if (
+            isset($param['maxLength']) &&
+            strlen($param['value']) > $param['maxLength']
+        ) {
+            return false;
+        }
+        if (
+            isset($param['minLength']) &&
+            strlen($param['value']) < $param['minLength']
+        ) {
+            return false;
+        }
+
         return true;
     }
 

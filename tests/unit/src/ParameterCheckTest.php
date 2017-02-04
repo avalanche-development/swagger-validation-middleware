@@ -606,4 +606,88 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
 
         $this->assertFalse($result);
     }
+
+    public function testCheckLengthBailsIfValueIsEmpty()
+    {
+        $mockParam = [
+            'maxLength' => 5,
+            'minLength' => 2,
+            'value' => '',
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckLength = $reflectedParameterCheck->getMethod('checkLength');
+        $reflectedCheckLength->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckLength->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCheckLengthFailsIfValueIsTooLong()
+    {
+        $mockParam = [
+            'maxLength' => 5,
+            'minLength' => 2,
+            'value' => '0123456789',
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckLength = $reflectedParameterCheck->getMethod('checkLength');
+        $reflectedCheckLength->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckLength->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertFalse($result);
+    }
+
+    public function testCheckLengthFailsIfValueIsTooShort()
+    {
+        $mockParam = [
+            'maxLength' => 5,
+            'minLength' => 2,
+            'value' => '0',
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckLength = $reflectedParameterCheck->getMethod('checkLength');
+        $reflectedCheckLength->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckLength->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertFalse($result);
+    }
+
+    public function testCheckLengthPassesIfValueIsJustRight()
+    {
+        $mockParam = [
+            'maxLength' => 5,
+            'minLength' => 2,
+            'value' => '0123',
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckLength = $reflectedParameterCheck->getMethod('checkLength');
+        $reflectedCheckLength->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckLength->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertTrue($result);
+    }
 }
