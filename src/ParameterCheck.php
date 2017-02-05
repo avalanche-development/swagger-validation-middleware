@@ -152,6 +152,13 @@ class ParameterCheck
      */
     protected function checkPattern(array $param)
     {
-        return true;
+        if (strlen($param['value']) < 1) {
+            return true;
+        }
+        if (!isset($param['pattern'])) {
+            return true;
+        }
+
+        return (preg_match("/{$param['pattern']}/", $param['value']) === 1);
     }
 }

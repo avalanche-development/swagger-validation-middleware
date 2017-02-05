@@ -690,4 +690,79 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($result);
     }
+
+    public function testCheckPatternBailsIfValueIsEmpty()
+    {
+        $mockParam = [
+            'pattern' => '^[a-z]$',
+            'value' => '',
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckPattern = $reflectedParameterCheck->getMethod('checkPattern');
+        $reflectedCheckPattern->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckPattern->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCheckPatternBailsIfPatternIsEmpty()
+    {
+        $mockParam = [
+            'value' => 'happy',
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckPattern = $reflectedParameterCheck->getMethod('checkPattern');
+        $reflectedCheckPattern->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckPattern->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @dataProvider checkPatternProvider
+     */
+    public function testCheckPatternHandlesDifferentValues($param, $expected)
+    {
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckPattern = $reflectedParameterCheck->getMethod('checkPattern');
+        $reflectedCheckPattern->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckPattern->invokeArgs($parameterCheck, [ $param ]);
+
+        $this->assertSame(
+            $expected,
+            $result,
+            'Expected ' . json_encode($param) . ' to be ' . ($expected ? 'true' : 'false')
+        );
+    }
+
+    public function checkPatternProvider()
+    {
+        return [
+            [ [ 'pattern' => '^[a-z]$', 'value' => '1234' ], false ],
+            [ [ 'pattern' => '\d+', 'value' => 'abc' ], false ],
+            [ [ 'pattern' => '^[0-1]{4}$', 'value' => '1010' ], true ],
+            [ [ 'pattern' => '\d0\d', 'value' => '101' ], true ],
+            [ [ 'pattern' => '^[night|day]$', 'value' => 'morning' ], false ],
+            [ [ 'pattern' => '\w+', 'value' => '  ' ], false ],
+        ];
+    }
+
+
 }
