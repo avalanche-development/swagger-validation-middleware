@@ -60,6 +60,15 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
+    protected function checkBodySchema(array $param)
+    {
+        return true;
+    }
+
+    /**
+     * @param array $param
+     * @return boolean
+     */
     protected function checkParamValue(array $param)
     {
         if ($param['type'] === 'array') {
