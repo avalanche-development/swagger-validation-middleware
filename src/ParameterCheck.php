@@ -126,6 +126,23 @@ class ParameterCheck
      */
     protected function checkRange(array $param)
     {
+        if (strlen($param['value']) < 1) {
+            return true;
+        }
+
+        if (isset($param['maximum']) && $param['value'] > $param['maximum']) {
+            return false;
+        }
+        if (isset($param['exclusiveMaximum']) && $param['value'] >= $param['exclusiveMaximum']) {
+            return false;
+        }
+        if (isset($param['minimum']) && $param['value'] < $param['minimum']) {
+            return false;
+        }
+        if (isset($param['exclusiveMinimum']) && $param['value'] <= $param['exclusiveMinimum']) {
+            return false;
+        }
+
         return true;
     }
 
@@ -139,16 +156,10 @@ class ParameterCheck
             return true;
         }
 
-        if (
-            isset($param['maxLength']) &&
-            strlen($param['value']) > $param['maxLength']
-        ) {
+        if (isset($param['maxLength']) && strlen($param['value']) > $param['maxLength']) {
             return false;
         }
-        if (
-            isset($param['minLength']) &&
-            strlen($param['value']) < $param['minLength']
-        ) {
+        if (isset($param['minLength']) && strlen($param['value']) < $param['minLength']) {
             return false;
         }
 

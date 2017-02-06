@@ -607,6 +607,130 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($result);
     }
 
+    public function testCheckRangeBailsIfValueIsEmpty()
+    {
+        $mockParam = [
+            'maximum' => 5,
+            'minimum' => 2,
+            'value' => null,
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckRange = $reflectedParameterCheck->getMethod('checkRange');
+        $reflectedCheckRange->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckRange->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCheckRangeFailsIfValueIsExceedsMaximum()
+    {
+        $mockParam = [
+            'maximum' => 5,
+            'minimum' => 2,
+            'value' => 6,
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckRange = $reflectedParameterCheck->getMethod('checkRange');
+        $reflectedCheckRange->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckRange->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertFalse($result);
+    }
+
+    public function testCheckRangeFailsIfValueIsExceedsExclusiveMaximum()
+    {
+        $mockParam = [
+            'exclusiveMaximum' => 5,
+            'value' => 5,
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckRange = $reflectedParameterCheck->getMethod('checkRange');
+        $reflectedCheckRange->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckRange->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertFalse($result);
+    }
+
+    public function testCheckRangeFailsIfValueIsExceedsMinimum()
+    {
+        $mockParam = [
+            'minimum' => 5,
+            'minimum' => 2,
+            'value' => 1,
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckRange = $reflectedParameterCheck->getMethod('checkRange');
+        $reflectedCheckRange->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckRange->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertFalse($result);
+    }
+
+    public function testCheckRangeFailsIfValueIsExceedsExclusiveMinimum()
+    {
+        $mockParam = [
+            'exclusiveMinimum' => 2,
+            'value' => 2,
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckRange = $reflectedParameterCheck->getMethod('checkRange');
+        $reflectedCheckRange->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckRange->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertFalse($result);
+    }
+
+    public function testCheckRangePassesIfValueIsJustRight()
+    {
+        $mockParam = [
+            'maximum' => 5,
+            'minimum' => 2,
+            'value' => 4,
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckRange = $reflectedParameterCheck->getMethod('checkRange');
+        $reflectedCheckRange->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $reflectedCheckRange->invokeArgs($parameterCheck, [ $mockParam ]);
+
+        $this->assertTrue($result);
+    }
+
     public function testCheckLengthBailsIfValueIsEmpty()
     {
         $mockParam = [
