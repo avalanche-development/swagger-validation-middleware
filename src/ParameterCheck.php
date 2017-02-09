@@ -117,6 +117,77 @@ class ParameterCheck
      */
     protected function checkFormat(array $param)
     {
+        if (strlen($param['value']) < 1) {
+            return true;
+        }
+
+        if ($param['type'] === 'boolean') {
+            return $this->checkBooleanFormat($param);
+        }
+        if ($param['type'] === 'integer') {
+            return $this->checkIntegerFormat($param);
+        }
+        if ($param['type'] === 'number') {
+            return $this->checkNumberFormat($param);
+        }
+        if ($param['type'] === 'string') {
+            return $this->checkStringFormat($param);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array $param
+     * @return boolean
+     */
+    protected function checkBooleanFormat(array $param)
+    {
+        return true;
+    }
+
+    /**
+     * @param array $param
+     * @return boolean
+     */
+    protected function checkIntegerFormat(array $param)
+    {
+        if (!is_int($param['value'])) {
+            return false;
+        }
+        if (!isset($param['format'])) {
+            return true;
+        }
+
+        if ($param['format'] === 'int32' && (
+            $param['value'] < -2147483647 || $param['value'] > -2147483647
+        )) {
+            return false;
+        }
+        if ($param['format'] === 'int64' && (
+            $param['value'] < -9223372036854775807 || $param['value'] > 9223372036854775807
+        )) {
+            return false;
+        } 
+
+        return true;
+    }
+
+    /**
+     * @param array $param
+     * @return boolean
+     */
+    protected function checkNumberFormat(array $param)
+    {
+        return true;
+    }
+
+    /**
+     * @param array $param
+     * @return boolean
+     */
+    protected function checkStringFormat(array $param)
+    {
         return true;
     }
 
