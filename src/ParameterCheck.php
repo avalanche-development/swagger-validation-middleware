@@ -7,53 +7,66 @@ use AvalancheDevelopment\Peel\HttpError;
 class ParameterCheck
 {
 
+    protected $integerCheck;
+
+    public function __construct()
+    {
+        $this->integerCheck = new Format\IntegerCheck;
+    }
+
     /**
      * @param array $params
      */
     public function checkParams(array $params)
     {
+        $validationErrors = [];
         $self = $this;
-        $isValid = array_reduce(
+        array_walk(
             $params,
-            function ($result, $param) use ($self) {
-                return ($self->checkParam($param) && $result);
-            },
-            true
+            function ($param) use ($self) {
+                try {
+                    $self->checkParam($param);
+                } catch (\Exception $e) {
+                    array_push($validationErrors, $e);
+                }
+            }
         );
 
-        if (!$isValid) {
+        // todo bubble up the errors
+        if (count($validationErrors) > 0) {
             throw new HttpError\BadRequest('Bad parameters passed in request');
         }
     }
 
     /**
      * @param array $param
-     * @return boolean
      */
     protected function checkParam(array $param)
     {
-        if (!$this->checkRequired($param)) {
-            return false;
-        }
+        $this->checkRequired($param);
+
+        // todo if empty, bail
 
         if ($param['in'] === 'body') {
-            return $this->checkBodySchema($param);
+            $this->checkBodySchema($param);
+            return;
         }
 
-        return $this->checkParamValue($param);
+        $this->checkParamValue($param);
     }
 
     /**
      * @param array $param
-     * @return boolean
      */
     protected function checkRequired(array $param)
     {
         if (!isset($param['required']) || $param['required'] === false) {
-            return true;
+            return;
         }
 
-        return isset($param['value']);
+        if (!isset($param['value'])) {
+            throw new \Exception('Required value was not set');
+        }
     }
 
     /**
@@ -62,7 +75,7 @@ class ParameterCheck
      */
     protected function checkBodySchema(array $param)
     {
-        return true;
+        return;
     }
 
     /**
@@ -125,7 +138,7 @@ class ParameterCheck
             return $this->checkBooleanFormat($param);
         }
         if ($param['type'] === 'integer') {
-            return $this->checkIntegerFormat($param);
+            return $this->integerCheck->check($param);
         }
         if ($param['type'] === 'number') {
             return $this->checkNumberFormat($param);
@@ -143,33 +156,6 @@ class ParameterCheck
      */
     protected function checkBooleanFormat(array $param)
     {
-        return true;
-    }
-
-    /**
-     * @param array $param
-     * @return boolean
-     */
-    protected function checkIntegerFormat(array $param)
-    {
-        if (!is_int($param['value'])) {
-            return false;
-        }
-        if (!isset($param['format'])) {
-            return true;
-        }
-
-        if ($param['format'] === 'int32' && (
-            $param['value'] < -2147483647 || $param['value'] > -2147483647
-        )) {
-            return false;
-        }
-        if ($param['format'] === 'int64' && (
-            $param['value'] < -9223372036854775807 || $param['value'] > 9223372036854775807
-        )) {
-            return false;
-        } 
-
         return true;
     }
 
