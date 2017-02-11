@@ -1,6 +1,6 @@
 <?php
 
-namespace AvalancheDevelopment\SwaggerValidationMiddleware;
+namespace AvalancheDevelopment\SwaggerValidationMiddleware\Parameter;
 
 use AvalancheDevelopment\Peel\HttpError;
 
@@ -20,17 +20,14 @@ class ParameterCheck
     public function checkParams(array $params)
     {
         $validationErrors = [];
-        $self = $this;
-        array_walk(
-            $params,
-            function ($param) use ($self) {
-                try {
-                    $self->checkParam($param);
-                } catch (\Exception $e) {
-                    array_push($validationErrors, $e);
-                }
+
+        foreach ($params as $param) {
+            try {
+                $this->checkParam($param);
+            } catch (ValidationException $e) {
+                array_push($validationErrors, $e);
             }
-        );
+        }
 
         // todo bubble up the errors
         if (count($validationErrors) > 0) {
@@ -65,7 +62,7 @@ class ParameterCheck
         }
 
         if (!isset($param['value'])) {
-            throw new \Exception('Required value was not set');
+            throw new ValidationException('Required value was not set');
         }
     }
 

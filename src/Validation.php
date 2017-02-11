@@ -18,7 +18,7 @@ class Validation implements LoggerAwareInterface
     /** @var HeaderCheck */
     protected $headerCheck;
 
-    /** @var ParameterCheck */
+    /** @var Parameter\ParameterCheck */
     protected $parameterCheck;
 
     /** @var SecurityCheck */
@@ -27,7 +27,7 @@ class Validation implements LoggerAwareInterface
     public function __construct()
     {
         $this->headerCheck = new HeaderCheck;
-        $this->parameterCheck = new ParameterCheck;
+        $this->parameterCheck = new Parameter\ParameterCheck;
         $this->securityCheck = new SecurityCheck;
 
         $this->logger = new NullLogger;

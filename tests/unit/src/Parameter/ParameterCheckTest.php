@@ -1,6 +1,6 @@
 <?php
 
-namespace AvalancheDevelopment\SwaggerValidationMiddleware;
+namespace AvalancheDevelopment\SwaggerValidationMiddleware\Parameter;
 
 use PHPUnit_Framework_TestCase;
 use ReflectionClass;
@@ -64,16 +64,18 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->getMock();
         $parameterCheck->method('checkParam')
             ->will($this->returnCallback(function ($param) {
-                return current($param) === 'valid';
+                if (current($param) === 'invalid') {
+                    throw new ValidationException('oh noes');
+                }
             }));
 
         $parameterCheck->checkParams($mockParams);
     }
 
-    public function testCheckParamBailsIfCheckRequiredFails()
+    public function testCheckParamChecksRequired()
     {
         $mockParam = [
-            'some requirement',
+            'in' => 'path',
         ];
 
         $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
@@ -90,16 +92,11 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->getMock();
         $parameterCheck->expects($this->never())
             ->method('checkBodySchema');
-        $parameterCheck->expects($this->never())
-            ->method('checkParamValue');
         $parameterCheck->expects($this->once())
             ->method('checkRequired')
-            ->with($mockParam)
-            ->willReturn(false);
+            ->with($mockParam);
 
-        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertFalse($result);
+        $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
     public function testCheckParamChecksBodySchemaIfBodyParam()
@@ -129,9 +126,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $parameterCheck->method('checkRequired')
             ->willReturn(true);
 
-        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertTrue($result);
+        $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
     public function testCheckParamChecksValueIfNotBodyParam()
@@ -161,9 +156,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $parameterCheck->method('checkRequired')
             ->willReturn(true);
 
-        $result = $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertTrue($result);
+        $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
     public function testCheckRequiredIgnoresUnsetRequiredSetting()
@@ -178,9 +171,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $result = $reflectedCheckRequired->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertTrue($result);
+        $reflectedCheckRequired->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
     public function testCheckRequiredIgnoresNonrequiredParam()
@@ -197,16 +188,20 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $result = $reflectedCheckRequired->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertTrue($result);
+        $reflectedCheckRequired->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
     /**
-     * @dataProvider checkRequiredParamsProvider
+     * @expectedException AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\ValidationException
+     * @expectedExceptionMessage Required value was not set
      */
-    public function testCheckRequiredReturnsBasedOnParamSet($param, $expected)
+    public function testCheckRequiredThrowsExceptionOnInvalidRequiredField()
     {
+        $mockParam = [
+            'required' => true,
+            'value' => null,
+        ];
+
         $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
         $reflectedCheckRequired = $reflectedParameterCheck->getMethod('checkRequired');
         $reflectedCheckRequired->setAccessible(true);
@@ -215,25 +210,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $result = $reflectedCheckRequired->invokeArgs($parameterCheck, [ $param ]);
-        
-        $this->assertSame(
-            $expected,
-            $result,
-            'Expected ' . json_encode($param) . ' to be ' . ($expected ? 'true' : 'false')
-        );
-    }
-
-    public function checkRequiredParamsProvider()
-    {
-        return [
-            [ [ 'required' => true ], false ],
-            [ [ 'required' => true, 'value' => '' ], true ],
-            [ [ 'required' => false, 'value' => null ], true ],
-            [ [ 'required' => true, 'value' => null ], false ],
-            [ [ 'required' => true, 'value' => 'puppies' ], true ],
-            [ [ 'required' => true, 'value' => 0 ], true ],
-        ];
+        $reflectedCheckRequired->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
     public function testCheckParamValueChecksItemsIfArray()

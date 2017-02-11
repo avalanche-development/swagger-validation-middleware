@@ -1,6 +1,6 @@
 <?php
 
-namespace AvalancheDevelopment\SwaggerValidationMiddleware\Format;
+namespace AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\Format;
 
 class IntegerCheck
 {
