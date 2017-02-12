@@ -4,6 +4,7 @@ namespace AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\Format;
 
 class IntegerCheck
 {
+
     /**
      * @param array $param
      * @return boolean
@@ -30,5 +31,4 @@ class IntegerCheck
 
         return true;
     }
-
 }
