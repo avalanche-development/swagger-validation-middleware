@@ -4,6 +4,7 @@ namespace AvalancheDevelopment\SwaggerValidationMiddleware;
 
 use AvalancheDevelopment\Peel\HttpError;
 use AvalancheDevelopment\SwaggerRouterMiddleware\ParsedSwaggerInterface;
+use AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\ParameterCheck;
 use Exception;
 use PHPUnit_Framework_TestCase;
 use Psr\Http\Message\RequestInterface;
