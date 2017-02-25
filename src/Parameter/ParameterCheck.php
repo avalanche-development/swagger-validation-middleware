@@ -7,11 +7,24 @@ use AvalancheDevelopment\Peel\HttpError;
 class ParameterCheck
 {
 
+    /** @var Format\BooleanCheck */
+    protected $booleanCheck;
+
+    /** @var Format\IntegerCheck */
     protected $integerCheck;
+
+    /** @var Format\NumberCheck */
+    protected $numberCheck;
+
+    /** @var Format\StringCheck */
+    protected $stringCheck;
 
     public function __construct()
     {
+        $this->booleanCheck = new Format\BooleanCheck;
         $this->integerCheck = new Format\IntegerCheck;
+        $this->numberCheck = new Format\NumberCheck;
+        $this->stringCheck = new Format\StringCheck;
     }
 
     /**
@@ -132,45 +145,18 @@ class ParameterCheck
         }
 
         if ($param['type'] === 'boolean') {
-            return $this->checkBooleanFormat($param);
+            return $this->booleanCheck->check($param);
         }
         if ($param['type'] === 'integer') {
             return $this->integerCheck->check($param);
         }
         if ($param['type'] === 'number') {
-            return $this->checkNumberFormat($param);
+            return $this->numberCheck->check($param);
         }
         if ($param['type'] === 'string') {
-            return $this->checkStringFormat($param);
+            return $this->stringCheck->check($param);
         }
 
-        return true;
-    }
-
-    /**
-     * @param array $param
-     * @return boolean
-     */
-    protected function checkBooleanFormat(array $param)
-    {
-        return true;
-    }
-
-    /**
-     * @param array $param
-     * @return boolean
-     */
-    protected function checkNumberFormat(array $param)
-    {
-        return true;
-    }
-
-    /**
-     * @param array $param
-     * @return boolean
-     */
-    protected function checkStringFormat(array $param)
-    {
         return true;
     }
 
