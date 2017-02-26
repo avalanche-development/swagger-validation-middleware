@@ -127,4 +127,22 @@ class NumberCheckTest extends PHPUnit_Framework_TestCase
 
         $reflectedCheckRange->invokeArgs($numberCheck, [ $mockParam ]);
     }
+
+    public function testCheckRangePassesIfWithinRange()
+    {
+        $mockParam = [
+            'maximum' => 5,
+            'minimum' => 2,
+            'value' => 4,
+        ];
+
+        $reflectedNumberCheck = new ReflectionClass(NumberCheck::class);
+        $reflectedCheckRange = $reflectedNumberCheck->getMethod('checkRange');
+        $reflectedCheckRange->setAccessible(true);
+
+        $numberCheck = $this->getMockBuilder(NumberCheck::class)
+            ->getMock();
+
+        $reflectedCheckRange->invokeArgs($numberCheck, [ $mockParam ]);
+    }
 }
