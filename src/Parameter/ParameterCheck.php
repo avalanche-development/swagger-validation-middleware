@@ -81,7 +81,6 @@ class ParameterCheck
 
     /**
      * @param array $param
-     * @return boolean
      */
     protected function checkBodySchema(array $param)
     {
@@ -90,80 +89,63 @@ class ParameterCheck
 
     /**
      * @param array $param
-     * @return boolean
      */
     protected function checkParamValue(array $param)
     {
         if ($param['type'] === 'array') {
-            if (!$this->checkItems($param)) {
-                return false;
-            }
+            $this->checkItems($param);
 
             $self = $this;
-            return array_reduce(
+            return array_walk(
                 $param['items'],
-                function ($result, $item) use ($self) {
-                    return ($self->checkParamValue($item) && $result);
-                },
-                true
+                function ($item) use ($self) {
+                    $self->checkParamValue($item);
+                }
             );
         }
 
-        if (!$this->checkFormat($param)) {
-            return false;
-        }
-        if ($param['type'] === 'number' && !$this->checkRange($param)) {
-            return false;
-        }
-        if ($param['type'] === 'string' && !$this->checkLength($param)) {
-            return false;
-        }
-        if ($param['type'] === 'string' && !$this->checkPattern($param)) {
-            return false;
-        }
-
-        return true;
+        $this->checkFormat($param);
     }
 
     /**
      * @param array $param
-     * @return boolean
      */
     protected function checkItems(array $param)
     {
-        return true;
+        return;
     }
 
     /**
      * @param array $param
-     * @return boolean
      */
     protected function checkFormat(array $param)
     {
         if (strlen($param['value']) < 1) {
-            return true;
+            return;
         }
 
         if ($param['type'] === 'boolean') {
-            return $this->booleanCheck->check($param);
+            $this->booleanCheck->check($param);
+            return;
         }
         if ($param['type'] === 'integer') {
-            return $this->integerCheck->check($param);
+            $this->integerCheck->check($param);
+            return;
         }
         if ($param['type'] === 'number') {
-            return $this->numberCheck->check($param);
+            $this->numberCheck->check($param);
+            return;
         }
         if ($param['type'] === 'string') {
-            return $this->stringCheck->check($param);
+            $this->stringCheck->check($param);
+            return;
         }
-
-        return true;
     }
 
     /**
      * @param array $param
-     * @return boolean
      */
+    // @todo move to number check
     protected function checkRange(array $param)
     {
         if (strlen($param['value']) < 1) {
@@ -190,6 +172,7 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
+    // @todo move to string check
     protected function checkLength(array $param)
     {
         if (strlen($param['value']) < 1) {
@@ -210,6 +193,7 @@ class ParameterCheck
      * @param array $param
      * @return boolean
      */
+    // @todo move to string check
     protected function checkPattern(array $param)
     {
         if (strlen($param['value']) < 1) {

@@ -24,8 +24,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->withConsecutive(
                 [ $mockParams[0] ],
                 [ $mockParams[1] ]
-            )
-            ->willReturn(true);
+            );
 
         $parameterCheck->checkParams($mockParams);
     }
@@ -41,8 +40,6 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods([ 'checkParam' ])
             ->getMock();
-        $parameterCheck->method('checkParam')
-            ->willReturn(true);
 
         $parameterCheck->checkParams($mockParams);
     }
@@ -119,12 +116,9 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->getMock();
         $parameterCheck->expects($this->once())
             ->method('checkBodySchema')
-            ->with($mockParam)
-            ->willReturn(true);
+            ->with($mockParam);
         $parameterCheck->expects($this->never())
             ->method('checkParamValue');
-        $parameterCheck->method('checkRequired')
-            ->willReturn(true);
 
         $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
     }
@@ -151,10 +145,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->method('checkBodySchema');
         $parameterCheck->expects($this->once())
             ->method('checkParamValue')
-            ->with($mockParam)
-            ->willReturn(true);
-        $parameterCheck->method('checkRequired')
-            ->willReturn(true);
+            ->with($mockParam);
 
         $reflectedCheckParam->invokeArgs($parameterCheck, [ $mockParam ]);
     }
@@ -229,33 +220,24 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->setMethods([
                 'checkFormat',
                 'checkItems',
-                'checkLength',
-                'checkPattern',
-                'checkRange',
             ])
             ->getMock();
         $parameterCheck->expects($this->never())
             ->method('checkFormat');
         $parameterCheck->expects($this->once())
             ->method('checkItems')
-            ->with($mockParam)
-            ->willReturn(true);
-        $parameterCheck->expects($this->never())
-            ->method('checkLength');
-        $parameterCheck->expects($this->never())
-            ->method('checkPattern');
-        $parameterCheck->expects($this->never())
-            ->method('checkRange');
+            ->with($mockParam);
 
-        $result = $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertTrue($result);
+        $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
     public function testCheckParamValueBailsIfArrayCheckItemsFails()
     {
+        $this->markTestIncomplete();
+
         $mockParam = [
             'type' => 'array',
+            'items' => [],
         ];
 
         $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
@@ -267,25 +249,12 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->setMethods([
                 'checkFormat',
                 'checkItems',
-                'checkLength',
-                'checkPattern',
-                'checkRange',
             ])
             ->getMock();
         $parameterCheck->expects($this->never())
             ->method('checkFormat');
-        $parameterCheck->method('checkItems')
-            ->willReturn(false);
-        $parameterCheck->expects($this->never())
-            ->method('checkLength');
-        $parameterCheck->expects($this->never())
-            ->method('checkPattern');
-        $parameterCheck->expects($this->never())
-            ->method('checkRange');
 
-        $result = $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertFalse($result);
+        $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
     public function testCheckParamValueChecksFormatIfNotArray()
@@ -303,31 +272,21 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->setMethods([
                 'checkFormat',
                 'checkItems',
-                'checkLength',
-                'checkPattern',
-                'checkRange',
             ])
             ->getMock();
         $parameterCheck->expects($this->once())
             ->method('checkFormat')
-            ->with($mockParam)
-            ->willReturn(true);
+            ->with($mockParam);
         $parameterCheck->expects($this->never())
             ->method('checkItems');
-        $parameterCheck->expects($this->never())
-            ->method('checkLength');
-        $parameterCheck->expects($this->never())
-            ->method('checkPattern');
-        $parameterCheck->expects($this->never())
-            ->method('checkRange');
 
-        $result = $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertTrue($result);
+        $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
     public function testCheckParamValueBailsIfCheckFormatFails()
     {
+        $this->markTestIncomplete();
+
         $mockParam = [
             'type' => 'string',
         ];
@@ -341,247 +300,12 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->setMethods([
                 'checkFormat',
                 'checkItems',
-                'checkLength',
-                'checkPattern',
-                'checkRange',
             ])
             ->getMock();
-        $parameterCheck->method('checkFormat')
-            ->willReturn(false);
         $parameterCheck->expects($this->never())
             ->method('checkItems');
-        $parameterCheck->expects($this->never())
-            ->method('checkLength');
-        $parameterCheck->expects($this->never())
-            ->method('checkPattern');
-        $parameterCheck->expects($this->never())
-            ->method('checkRange');
 
-        $result = $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertFalse($result);
-    }
-
-    public function testCheckParamValueChecksRangeIfNumber()
-    {
-        $mockParam = [
-            'type' => 'number',
-        ];
-
-        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
-        $reflectedCheckParamValue = $reflectedParameterCheck->getMethod('checkParamValue');
-        $reflectedCheckParamValue->setAccessible(true);
-
-        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
-            ->disableOriginalConstructor()
-            ->setMethods([
-                'checkFormat',
-                'checkItems',
-                'checkLength',
-                'checkPattern',
-                'checkRange',
-            ])
-            ->getMock();
-        $parameterCheck->method('checkFormat')
-            ->willReturn(true);
-        $parameterCheck->expects($this->never())
-            ->method('checkItems');
-        $parameterCheck->expects($this->never())
-            ->method('checkLength');
-        $parameterCheck->expects($this->never())
-            ->method('checkPattern');
-        $parameterCheck->expects($this->once())
-            ->method('checkRange')
-            ->with($mockParam)
-            ->willReturn(true);
-
-        $result = $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertTrue($result);
-    }
-
-    public function testCheckParamValueBailsIfCheckRangeFails()
-    {
-        $mockParam = [
-            'type' => 'number',
-        ];
-
-        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
-        $reflectedCheckParamValue = $reflectedParameterCheck->getMethod('checkParamValue');
-        $reflectedCheckParamValue->setAccessible(true);
-
-        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
-            ->disableOriginalConstructor()
-            ->setMethods([
-                'checkFormat',
-                'checkItems',
-                'checkLength',
-                'checkPattern',
-                'checkRange',
-            ])
-            ->getMock();
-        $parameterCheck->method('checkFormat')
-            ->willReturn(true);
-        $parameterCheck->expects($this->never())
-            ->method('checkItems');
-        $parameterCheck->expects($this->never())
-            ->method('checkLength');
-        $parameterCheck->expects($this->never())
-            ->method('checkPattern');
-        $parameterCheck->method('checkRange')
-            ->willReturn(false);
-
-        $result = $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertFalse($result);
-    }
-
-    public function testCheckParamValueChecksLengthIfString()
-    {
-        $mockParam = [
-            'type' => 'string',
-        ];
-
-        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
-        $reflectedCheckParamValue = $reflectedParameterCheck->getMethod('checkParamValue');
-        $reflectedCheckParamValue->setAccessible(true);
-
-        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
-            ->disableOriginalConstructor()
-            ->setMethods([
-                'checkFormat',
-                'checkItems',
-                'checkLength',
-                'checkPattern',
-                'checkRange',
-            ])
-            ->getMock();
-        $parameterCheck->method('checkFormat')
-            ->willReturn(true);
-        $parameterCheck->expects($this->never())
-            ->method('checkItems');
-        $parameterCheck->expects($this->once())
-            ->method('checkLength')
-            ->with($mockParam)
-            ->willReturn(true);
-        $parameterCheck->method('checkPattern')
-            ->willReturn(true);
-        $parameterCheck->expects($this->never())
-            ->method('checkRange');
-
-        $result = $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertTrue($result);
-    }
-
-    public function testCheckParamValueBailsIfCheckLengthFails()
-    {
-        $mockParam = [
-            'type' => 'string',
-        ];
-
-        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
-        $reflectedCheckParamValue = $reflectedParameterCheck->getMethod('checkParamValue');
-        $reflectedCheckParamValue->setAccessible(true);
-
-        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
-            ->disableOriginalConstructor()
-            ->setMethods([
-                'checkFormat',
-                'checkItems',
-                'checkLength',
-                'checkPattern',
-                'checkRange',
-            ])
-            ->getMock();
-        $parameterCheck->method('checkFormat')
-            ->willReturn(true);
-        $parameterCheck->expects($this->never())
-            ->method('checkItems');
-        $parameterCheck->method('checkLength')
-            ->willReturn(false);
-        $parameterCheck->expects($this->never())
-            ->method('checkPattern');
-        $parameterCheck->expects($this->never())
-            ->method('checkRange');
-
-        $result = $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertFalse($result);
-    }
-
-    public function testCheckParamValueChecksPatternIfString()
-    {
-        $mockParam = [
-            'type' => 'string',
-        ];
-
-        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
-        $reflectedCheckParamValue = $reflectedParameterCheck->getMethod('checkParamValue');
-        $reflectedCheckParamValue->setAccessible(true);
-
-        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
-            ->disableOriginalConstructor()
-            ->setMethods([
-                'checkFormat',
-                'checkItems',
-                'checkLength',
-                'checkPattern',
-                'checkRange',
-            ])
-            ->getMock();
-        $parameterCheck->method('checkFormat')
-            ->willReturn(true);
-        $parameterCheck->expects($this->never())
-            ->method('checkItems');
-        $parameterCheck->method('checkLength')
-            ->willReturn(true);
-        $parameterCheck->expects($this->once())
-            ->method('checkPattern')
-            ->with($mockParam)
-            ->willReturn(true);
-        $parameterCheck->expects($this->never())
-            ->method('checkRange');
-
-        $result = $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertTrue($result);
-    }
-
-    public function testCheckParamValueBailsIfCheckPatternFails()
-    {
-        $mockParam = [
-            'type' => 'string',
-        ];
-
-        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
-        $reflectedCheckParamValue = $reflectedParameterCheck->getMethod('checkParamValue');
-        $reflectedCheckParamValue->setAccessible(true);
-
-        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
-            ->disableOriginalConstructor()
-            ->setMethods([
-                'checkFormat',
-                'checkItems',
-                'checkLength',
-                'checkPattern',
-                'checkRange',
-            ])
-            ->getMock();
-        $parameterCheck->method('checkFormat')
-            ->willReturn(true);
-        $parameterCheck->expects($this->never())
-            ->method('checkItems');
-        $parameterCheck->method('checkLength')
-            ->willReturn(true);
-        $parameterCheck->method('checkPattern')
-            ->willReturn(false);
-        $parameterCheck->expects($this->never())
-            ->method('checkRange');
-
-        $result = $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
-
-        $this->assertFalse($result);
+        $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
     public function testCheckRangeBailsIfValueIsEmpty()
