@@ -310,6 +310,8 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
 
     public function testCheckRangeBailsIfValueIsEmpty()
     {
+        $this->markTestIncomplete();
+
         $mockParam = [
             'maximum' => 5,
             'minimum' => 2,
@@ -331,6 +333,8 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
 
     public function testCheckRangeFailsIfValueIsExceedsMaximum()
     {
+        $this->markTestIncomplete();
+
         $mockParam = [
             'maximum' => 5,
             'minimum' => 2,
@@ -352,6 +356,8 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
 
     public function testCheckRangeFailsIfValueIsExceedsExclusiveMaximum()
     {
+        $this->markTestIncomplete();
+
         $mockParam = [
             'exclusiveMaximum' => 5,
             'value' => 5,
@@ -372,6 +378,8 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
 
     public function testCheckRangeFailsIfValueIsExceedsMinimum()
     {
+        $this->markTestIncomplete();
+
         $mockParam = [
             'minimum' => 5,
             'minimum' => 2,
@@ -393,6 +401,8 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
 
     public function testCheckRangeFailsIfValueIsExceedsExclusiveMinimum()
     {
+        $this->markTestIncomplete();
+
         $mockParam = [
             'exclusiveMinimum' => 2,
             'value' => 2,
@@ -413,6 +423,8 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
 
     public function testCheckRangePassesIfValueIsJustRight()
     {
+        $this->markTestIncomplete();
+
         $mockParam = [
             'maximum' => 5,
             'minimum' => 2,

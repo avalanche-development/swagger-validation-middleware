@@ -144,32 +144,6 @@ class ParameterCheck
 
     /**
      * @param array $param
-     */
-    // @todo move to number check
-    protected function checkRange(array $param)
-    {
-        if (strlen($param['value']) < 1) {
-            return true;
-        }
-
-        if (isset($param['maximum']) && $param['value'] > $param['maximum']) {
-            return false;
-        }
-        if (isset($param['exclusiveMaximum']) && $param['value'] >= $param['exclusiveMaximum']) {
-            return false;
-        }
-        if (isset($param['minimum']) && $param['value'] < $param['minimum']) {
-            return false;
-        }
-        if (isset($param['exclusiveMinimum']) && $param['value'] <= $param['exclusiveMinimum']) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param array $param
      * @return boolean
      */
     // @todo move to string check
