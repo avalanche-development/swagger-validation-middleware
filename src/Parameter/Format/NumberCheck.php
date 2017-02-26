@@ -12,7 +12,7 @@ class NumberCheck
      */
     public function check(array $param)
     {
-        if (!is_float($param['value'])) {
+        if (!is_int($param['value']) && !is_float($param['value'])) {
             throw new ValidationException('Value is not a number');
         }
 
@@ -31,10 +31,10 @@ class NumberCheck
             throw new ValidationException('Value exceeds exclusiveMaximum');
         }
         if (isset($param['minimum']) && $param['value'] < $param['minimum']) {
-            throw new ValidationException('Value exceeds mimimum');
+            throw new ValidationException('Value exceeds minimum');
         }
         if (isset($param['exclusiveMinimum']) && $param['value'] <= $param['exclusiveMinimum']) {
-            throw new ValidationException('value exceeds exclusiveMinimum');
+            throw new ValidationException('Value exceeds exclusiveMinimum');
         }
     }
 }
