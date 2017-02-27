@@ -12,6 +12,8 @@ class BooleanCheck
      */
     public function check(array $param)
     {
-        return true;
+        if (!is_bool($param['value'])) {
+            throw new ValidationException('Value is not a boolean');
+        }
     }
 }
