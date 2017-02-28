@@ -308,6 +308,264 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
+    public function testCheckFormatBailsIfValueIsEmpty()
+    {
+        $mockParam = [
+            'value' => '',
+        ];
+
+        $mockBooleanCheck = $this->getMockBuilder(Format\BooleanCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockBooleanCheck->expects($this->never())
+            ->method('check');
+        $mockIntegerCheck = $this->getMockBuilder(Format\IntegerCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockIntegerCheck->expects($this->never())
+            ->method('check');
+        $mockNumberCheck = $this->getMockBuilder(Format\NumberCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockNumberCheck->expects($this->never())
+            ->method('check');
+        $mockStringCheck = $this->getMockBuilder(Format\StringCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockStringCheck->expects($this->never())
+            ->method('check');
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedBooleanCheckValue = $reflectedParameterCheck->getProperty('booleanCheck');
+        $reflectedBooleanCheckValue->setAccessible(true);
+        $reflectedIntegerCheckValue = $reflectedParameterCheck->getProperty('integerCheck');
+        $reflectedIntegerCheckValue->setAccessible(true);
+        $reflectedNumberCheckValue = $reflectedParameterCheck->getProperty('numberCheck');
+        $reflectedNumberCheckValue->setAccessible(true);
+        $reflectedStringCheckValue = $reflectedParameterCheck->getProperty('stringCheck');
+        $reflectedStringCheckValue->setAccessible(true);
+        $reflectedCheckFormat = $reflectedParameterCheck->getMethod('checkFormat');
+        $reflectedCheckFormat->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedBooleanCheckValue->setValue($parameterCheck, $mockBooleanCheck);
+        $reflectedIntegerCheckValue->setValue($parameterCheck, $mockIntegerCheck);
+        $reflectedNumberCheckValue->setValue($parameterCheck, $mockNumberCheck);
+        $reflectedStringCheckValue->setValue($parameterCheck, $mockStringCheck);
+        $reflectedCheckFormat->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckFormatChecksBooleanIfBoolean()
+    {
+        $mockParam = [
+            'type' => 'boolean',
+            'value' => 'some value',
+        ];
+
+        $mockBooleanCheck = $this->getMockBuilder(Format\BooleanCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockBooleanCheck->expects($this->once())
+            ->method('check')
+            ->with($mockParam);
+        $mockIntegerCheck = $this->getMockBuilder(Format\IntegerCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockIntegerCheck->expects($this->never())
+            ->method('check');
+        $mockNumberCheck = $this->getMockBuilder(Format\NumberCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockNumberCheck->expects($this->never())
+            ->method('check');
+        $mockStringCheck = $this->getMockBuilder(Format\StringCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockStringCheck->expects($this->never())
+            ->method('check');
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedBooleanCheckValue = $reflectedParameterCheck->getProperty('booleanCheck');
+        $reflectedBooleanCheckValue->setAccessible(true);
+        $reflectedIntegerCheckValue = $reflectedParameterCheck->getProperty('integerCheck');
+        $reflectedIntegerCheckValue->setAccessible(true);
+        $reflectedNumberCheckValue = $reflectedParameterCheck->getProperty('numberCheck');
+        $reflectedNumberCheckValue->setAccessible(true);
+        $reflectedStringCheckValue = $reflectedParameterCheck->getProperty('stringCheck');
+        $reflectedStringCheckValue->setAccessible(true);
+        $reflectedCheckFormat = $reflectedParameterCheck->getMethod('checkFormat');
+        $reflectedCheckFormat->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedBooleanCheckValue->setValue($parameterCheck, $mockBooleanCheck);
+        $reflectedIntegerCheckValue->setValue($parameterCheck, $mockIntegerCheck);
+        $reflectedNumberCheckValue->setValue($parameterCheck, $mockNumberCheck);
+        $reflectedStringCheckValue->setValue($parameterCheck, $mockStringCheck);
+        $reflectedCheckFormat->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckFormatCheckIntegerIfInteger()
+    {
+        $mockParam = [
+            'type' => 'integer',
+            'value' => 'some value',
+        ];
+
+        $mockBooleanCheck = $this->getMockBuilder(Format\BooleanCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockBooleanCheck->expects($this->never())
+            ->method('check');
+        $mockIntegerCheck = $this->getMockBuilder(Format\IntegerCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockIntegerCheck->expects($this->once())
+            ->method('check')
+            ->with($mockParam);
+        $mockNumberCheck = $this->getMockBuilder(Format\NumberCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockNumberCheck->expects($this->never())
+            ->method('check');
+        $mockStringCheck = $this->getMockBuilder(Format\StringCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockStringCheck->expects($this->never())
+            ->method('check');
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedBooleanCheckValue = $reflectedParameterCheck->getProperty('booleanCheck');
+        $reflectedBooleanCheckValue->setAccessible(true);
+        $reflectedIntegerCheckValue = $reflectedParameterCheck->getProperty('integerCheck');
+        $reflectedIntegerCheckValue->setAccessible(true);
+        $reflectedNumberCheckValue = $reflectedParameterCheck->getProperty('numberCheck');
+        $reflectedNumberCheckValue->setAccessible(true);
+        $reflectedStringCheckValue = $reflectedParameterCheck->getProperty('stringCheck');
+        $reflectedStringCheckValue->setAccessible(true);
+        $reflectedCheckFormat = $reflectedParameterCheck->getMethod('checkFormat');
+        $reflectedCheckFormat->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedBooleanCheckValue->setValue($parameterCheck, $mockBooleanCheck);
+        $reflectedIntegerCheckValue->setValue($parameterCheck, $mockIntegerCheck);
+        $reflectedNumberCheckValue->setValue($parameterCheck, $mockNumberCheck);
+        $reflectedStringCheckValue->setValue($parameterCheck, $mockStringCheck);
+        $reflectedCheckFormat->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckFormatChecksNumberIfNumber()
+    {
+        $mockParam = [
+            'type' => 'number',
+            'value' => 'some value',
+        ];
+
+        $mockBooleanCheck = $this->getMockBuilder(Format\BooleanCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockBooleanCheck->expects($this->never())
+            ->method('check');
+        $mockIntegerCheck = $this->getMockBuilder(Format\IntegerCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockIntegerCheck->expects($this->never())
+            ->method('check');
+        $mockNumberCheck = $this->getMockBuilder(Format\NumberCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockNumberCheck->expects($this->once())
+            ->method('check')
+            ->with($mockParam);
+        $mockStringCheck = $this->getMockBuilder(Format\StringCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockStringCheck->expects($this->never())
+            ->method('check');
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedBooleanCheckValue = $reflectedParameterCheck->getProperty('booleanCheck');
+        $reflectedBooleanCheckValue->setAccessible(true);
+        $reflectedIntegerCheckValue = $reflectedParameterCheck->getProperty('integerCheck');
+        $reflectedIntegerCheckValue->setAccessible(true);
+        $reflectedNumberCheckValue = $reflectedParameterCheck->getProperty('numberCheck');
+        $reflectedNumberCheckValue->setAccessible(true);
+        $reflectedStringCheckValue = $reflectedParameterCheck->getProperty('stringCheck');
+        $reflectedStringCheckValue->setAccessible(true);
+        $reflectedCheckFormat = $reflectedParameterCheck->getMethod('checkFormat');
+        $reflectedCheckFormat->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedBooleanCheckValue->setValue($parameterCheck, $mockBooleanCheck);
+        $reflectedIntegerCheckValue->setValue($parameterCheck, $mockIntegerCheck);
+        $reflectedNumberCheckValue->setValue($parameterCheck, $mockNumberCheck);
+        $reflectedStringCheckValue->setValue($parameterCheck, $mockStringCheck);
+        $reflectedCheckFormat->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckFormatChecksStringIfString()
+    {
+        $mockParam = [
+            'type' => 'string',
+            'value' => 'some value',
+        ];
+
+        $mockBooleanCheck = $this->getMockBuilder(Format\BooleanCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockBooleanCheck->expects($this->never())
+            ->method('check');
+        $mockIntegerCheck = $this->getMockBuilder(Format\IntegerCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockIntegerCheck->expects($this->never())
+            ->method('check');
+        $mockNumberCheck = $this->getMockBuilder(Format\NumberCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockNumberCheck->expects($this->never())
+            ->method('check');
+        $mockStringCheck = $this->getMockBuilder(Format\StringCheck::class)
+            ->setMethods([ 'check' ])
+            ->getMock();
+        $mockStringCheck->expects($this->once())
+            ->method('check')
+            ->with($mockParam);
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedBooleanCheckValue = $reflectedParameterCheck->getProperty('booleanCheck');
+        $reflectedBooleanCheckValue->setAccessible(true);
+        $reflectedIntegerCheckValue = $reflectedParameterCheck->getProperty('integerCheck');
+        $reflectedIntegerCheckValue->setAccessible(true);
+        $reflectedNumberCheckValue = $reflectedParameterCheck->getProperty('numberCheck');
+        $reflectedNumberCheckValue->setAccessible(true);
+        $reflectedStringCheckValue = $reflectedParameterCheck->getProperty('stringCheck');
+        $reflectedStringCheckValue->setAccessible(true);
+        $reflectedCheckFormat = $reflectedParameterCheck->getMethod('checkFormat');
+        $reflectedCheckFormat->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedBooleanCheckValue->setValue($parameterCheck, $mockBooleanCheck);
+        $reflectedIntegerCheckValue->setValue($parameterCheck, $mockIntegerCheck);
+        $reflectedNumberCheckValue->setValue($parameterCheck, $mockNumberCheck);
+        $reflectedStringCheckValue->setValue($parameterCheck, $mockStringCheck);
+        $reflectedCheckFormat->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
     public function testCheckLengthBailsIfValueIsEmpty()
     {
         $mockParam = [
