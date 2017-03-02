@@ -141,42 +141,4 @@ class ParameterCheck
             return;
         }
     }
-
-    /**
-     * @param array $param
-     * @return boolean
-     */
-    // @todo move to string check
-    protected function checkLength(array $param)
-    {
-        if (strlen($param['value']) < 1) {
-            return true;
-        }
-
-        if (isset($param['maxLength']) && strlen($param['value']) > $param['maxLength']) {
-            return false;
-        }
-        if (isset($param['minLength']) && strlen($param['value']) < $param['minLength']) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param array $param
-     * @return boolean
-     */
-    // @todo move to string check
-    protected function checkPattern(array $param)
-    {
-        if (strlen($param['value']) < 1) {
-            return true;
-        }
-        if (!isset($param['pattern'])) {
-            return true;
-        }
-
-        return (preg_match("/{$param['pattern']}/", $param['value']) === 1);
-    }
 }
