@@ -10,6 +10,242 @@ class StringCheckTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\ValidationException
+     * @expectedExceptionMessage Value is not a string
+     */
+    public function testCheckThrowsExceptionIfNotAString()
+    {
+        $mockParam = [
+            'value' => 1234,
+        ];
+
+        $stringCheck = $this->getMockBuilder(StringCheck::class)
+            ->setMethods([
+                'checkLength',
+                'checkPattern',
+            ])
+            ->getMock();
+
+        $stringCheck->check($mockParam);
+    }
+
+    public function testCheckIgnoresFormatIfNotDefined()
+    {
+        $mockParam = [
+            'value' => 'some string',
+        ];
+
+        $stringCheck = $this->getMockBuilder(StringCheck::class)
+            ->setMethods([
+                'checkLength',
+                'checkPattern',
+            ])
+            ->getMock();
+
+        $stringCheck->check($mockParam);
+    }
+
+    /**
+     * @expectedException AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\ValidationException
+     * @expectedExceptionMessage Value is not a byte
+     */
+    public function testCheckThrowsExceptionIfNotAByte()
+    {
+        $mockParam = [
+            'value' => 'some string',
+            'format' => 'byte',
+        ];
+
+        $stringCheck = $this->getMockBuilder(StringCheck::class)
+            ->setMethods([
+                'checkLength',
+                'checkPattern',
+            ])
+            ->getMock();
+
+        $stringCheck->check($mockParam);
+    }
+
+    public function testCheckContinuesIfByteIsByte()
+    {
+        $mockParam = [
+            'value' => 'someString=',
+            'format' => 'byte',
+        ];
+
+        $stringCheck = $this->getMockBuilder(StringCheck::class)
+            ->setMethods([
+                'checkLength',
+                'checkPattern',
+            ])
+            ->getMock();
+
+        $stringCheck->check($mockParam);
+    }
+
+    /**
+     * @expectedException AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\ValidationException
+     * @expectedExceptionMessage Value is not a binary
+     */
+    public function testCheckThrowsExceptionIfNotABinary()
+    {
+        $mockParam = [
+            'value' => 'some string',
+            'format' => 'binary',
+        ];
+
+        $stringCheck = $this->getMockBuilder(StringCheck::class)
+            ->setMethods([
+                'checkLength',
+                'checkPattern',
+            ])
+            ->getMock();
+
+        $stringCheck->check($mockParam);
+    }
+
+    public function testCheckContinuesIfBinaryIsBinary()
+    {
+        $mockParam = [
+            'value' => '10101010',
+            'format' => 'binary',
+        ];
+
+        $stringCheck = $this->getMockBuilder(StringCheck::class)
+            ->setMethods([
+                'checkLength',
+                'checkPattern',
+            ])
+            ->getMock();
+
+        $stringCheck->check($mockParam);
+    }
+
+    /**
+     * @expectedException AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\ValidationException
+     * @expectedExceptionMessage Value is not a date
+     */
+    public function testCheckThrowsExceptionIfNotADate()
+    {
+        $this->markTestIncomplete();
+
+        $mockParam = [
+            'value' => 'some string',
+            'format' => 'date',
+        ];
+
+        $stringCheck = $this->getMockBuilder(StringCheck::class)
+            ->setMethods([
+                'checkLength',
+                'checkPattern',
+            ])
+            ->getMock();
+
+        $stringCheck->check($mockParam);
+    }
+
+    public function testCheckContinuesIfDateIsADate()
+    {
+        $this->markTestIncomplete();
+
+        $mockParam = [
+            'value' => 'some string',
+            'format' => 'date',
+        ];
+
+        $stringCheck = $this->getMockBuilder(StringCheck::class)
+            ->setMethods([
+                'checkLength',
+                'checkPattern',
+            ])
+            ->getMock();
+
+        $stringCheck->check($mockParam);
+    }
+
+    /**
+     * @expectedException AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\ValidationException
+     * @expectedExceptionMessage Value is not a datetime
+     */
+    public function testCheckThrowsExceptionIfNotADatetime()
+    {
+        $this->markTestIncomplete();
+
+        $mockParam = [
+            'value' => 'some string',
+            'format' => 'datetime',
+        ];
+
+        $stringCheck = $this->getMockBuilder(StringCheck::class)
+            ->setMethods([
+                'checkLength',
+                'checkPattern',
+            ])
+            ->getMock();
+
+        $stringCheck->check($mockParam);
+    }
+
+    public function testCheckContinuesIfDatetimeIsADatetime()
+    {
+        $this->markTestIncomplete();
+
+        $mockParam = [
+            'value' => 'some string',
+            'format' => 'datetime',
+        ];
+
+        $stringCheck = $this->getMockBuilder(StringCheck::class)
+            ->setMethods([
+                'checkLength',
+                'checkPattern',
+            ])
+            ->getMock();
+
+        $stringCheck->check($mockParam);
+    }
+
+    public function testCheckCallsToCheckLength()
+    {
+        $mockParam = [
+            'value' => 'some string',
+            'format' => 'some format',
+        ];
+
+        $stringCheck = $this->getMockBuilder(StringCheck::class)
+            ->setMethods([
+                'checkLength',
+                'checkPattern',
+            ])
+            ->getMock();
+        $stringCheck->expects($this->once())
+            ->method('checkLength')
+            ->with($mockParam);
+
+        $stringCheck->check($mockParam);
+    }
+
+    public function testCheckCallsToCheckPattern()
+    {
+        $mockParam = [
+            'value' => 'some string',
+            'format' => 'some format',
+        ];
+
+        $stringCheck = $this->getMockBuilder(StringCheck::class)
+            ->setMethods([
+                'checkLength',
+                'checkPattern',
+            ])
+            ->getMock();
+        $stringCheck->expects($this->once())
+            ->method('checkPattern')
+            ->with($mockParam);
+
+        $stringCheck->check($mockParam);
+    }
+
+    /**
+     * @expectedException AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\ValidationException
      * @expectedExceptionMessage Value exceeds maxLength
      */
     public function testCheckLengthFailsIfValueIsTooLong()
