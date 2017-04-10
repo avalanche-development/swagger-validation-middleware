@@ -12,7 +12,7 @@ class NumberCheck
      */
     public function check(array $param)
     {
-        if (!is_int($param['value']) && !is_float($param['value'])) {
+        if (!filter_var($param['value'], FILTER_VALIDATE_FLOAT)) {
             throw new ValidationException('Value is not a number');
         }
 

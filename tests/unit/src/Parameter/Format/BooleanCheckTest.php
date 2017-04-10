@@ -24,7 +24,7 @@ class BooleanCheckTest extends PHPUnit_Framework_TestCase
     public function testCheckContinuesNormallyIfOkay()
     {
         $mockParam = [
-            'value' => false,
+            'value' => 'false',
         ];
 
         $booleanCheck = new BooleanCheck;

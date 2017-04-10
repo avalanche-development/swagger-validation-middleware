@@ -28,7 +28,7 @@ class NumberCheckTest extends PHPUnit_Framework_TestCase
     public function testCheckCallsToRangeCheckIfOkay()
     {
         $mockParam = [
-            'value' => 512.123,
+            'value' => (string) 512.123,
         ];
 
         $numberCheck = $this->getMockBuilder(NumberCheck::class)
@@ -51,7 +51,7 @@ class NumberCheckTest extends PHPUnit_Framework_TestCase
         $mockParam = [
             'maximum' => 5,
             'minimum' => 2,
-            'value' => 6,
+            'value' => (string) 6,
         ];
 
         $reflectedNumberCheck = new ReflectionClass(NumberCheck::class);
@@ -72,7 +72,7 @@ class NumberCheckTest extends PHPUnit_Framework_TestCase
     {
         $mockParam = [
             'exclusiveMaximum' => 5,
-            'value' => 5,
+            'value' => (string) 5,
         ];
 
         $reflectedNumberCheck = new ReflectionClass(NumberCheck::class);
@@ -94,7 +94,7 @@ class NumberCheckTest extends PHPUnit_Framework_TestCase
         $mockParam = [
             'minimum' => 5,
             'minimum' => 2,
-            'value' => 1,
+            'value' => (string) 1,
         ];
 
         $reflectedNumberCheck = new ReflectionClass(NumberCheck::class);
@@ -115,7 +115,7 @@ class NumberCheckTest extends PHPUnit_Framework_TestCase
     {
         $mockParam = [
             'exclusiveMinimum' => 2,
-            'value' => 2,
+            'value' => (string) 2,
         ];
 
         $reflectedNumberCheck = new ReflectionClass(NumberCheck::class);
@@ -133,7 +133,7 @@ class NumberCheckTest extends PHPUnit_Framework_TestCase
         $mockParam = [
             'maximum' => 5,
             'minimum' => 2,
-            'value' => 4,
+            'value' => (string) 4,
         ];
 
         $reflectedNumberCheck = new ReflectionClass(NumberCheck::class);

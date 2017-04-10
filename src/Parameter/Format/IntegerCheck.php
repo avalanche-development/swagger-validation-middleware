@@ -12,7 +12,7 @@ class IntegerCheck
      */
     public function check(array $param)
     {
-        if (!is_int($param['value'])) {
+        if (!filter_var($param['value'], FILTER_VALIDATE_INT)) {
             throw new ValidationException('Value is not an integer');
         }
         if (!isset($param['format'])) {

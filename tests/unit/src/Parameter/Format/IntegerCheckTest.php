@@ -24,7 +24,7 @@ class IntegerCheckTest extends PHPUnit_Framework_TestCase
     public function testCheckIgnoresFormatIfNotDefined()
     {
         $mockParam = [
-            'value' => 2147483647 + 1,
+            'value' => (string) 2147483647 + 1,
         ];
 
         $integerCheck = new IntegerCheck;
@@ -38,7 +38,7 @@ class IntegerCheckTest extends PHPUnit_Framework_TestCase
     public function testCheckThrowsExceptionIfExceedsInt32Bounds()
     {
         $mockParam = [
-            'value' => 2147483647 + 1,
+            'value' => (string) 2147483647 + 1,
             'format' => 'int32',
         ];
 
@@ -49,7 +49,7 @@ class IntegerCheckTest extends PHPUnit_Framework_TestCase
     public function testCheckPassesIfWithinInt32Bounds()
     {
         $mockParam = [
-            'value' => -2147483647 + 1,
+            'value' => (string) -2147483647 + 1,
             'format' => 'int32',
         ];
 
@@ -64,7 +64,7 @@ class IntegerCheckTest extends PHPUnit_Framework_TestCase
     public function testCheckThrowsExceptionIfExceedsInt64Bounds()
     {
        $mockParam = [
-           'value' => -9223372036854775807 - 1,
+           'value' => (string) -9223372036854775807 - 1,
            'format' => 'int64',
        ];
 
@@ -75,7 +75,7 @@ class IntegerCheckTest extends PHPUnit_Framework_TestCase
     public function testCheckPassesIfWithinInt64Bounds()
     {
         $mockParam = [
-            'value' => 9223372036854775807 - 1,
+            'value' => (string) 9223372036854775807 - 1,
         ];
 
         $integerCheck = new IntegerCheck;
