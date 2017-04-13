@@ -93,26 +93,22 @@ class ParameterCheck
     protected function checkParamValue(array $param)
     {
         if ($param['type'] === 'array') {
-            $this->checkItems($param);
-
             $self = $this;
             return array_walk(
-                $param['items'],
-                function ($item) use ($self) {
-                    $self->checkParamValue($item);
+                $param['value'],
+                function ($value) use ($self, $param) {
+                    $itemParam = array_merge(
+                        $param['items'],
+                        [
+                            'value' => $value,
+                        ]
+                    );
+                    $self->checkParamValue($itemParam);
                 }
             );
         }
 
         $this->checkFormat($param);
-    }
-
-    /**
-     * @param array $param
-     */
-    protected function checkItems(array $param)
-    {
-        return;
     }
 
     /**
