@@ -29,10 +29,17 @@ class StringCheck
         )) {
             throw new ValidationException('Value is not a binary');
         }
-        if ($param['format'] === 'date') {
+        if ($param['format'] === 'date' &&
+            preg_match('/^\d{4}-\d{2}-\d{2}$/', $param['value']) !== 1
+        ) {
             throw new ValidationException('Value is not a date');
         }
-        if ($param['format'] === 'datetime') {
+        if ($param['format'] === 'datetime' &&
+            preg_match(
+                '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[zZ]|(?:[+-]\d{2}:\d{2}))$/',
+                $param['value']
+            ) !== 1
+        ) {
             throw new ValidationException('Value is not a datetime');
         }
 

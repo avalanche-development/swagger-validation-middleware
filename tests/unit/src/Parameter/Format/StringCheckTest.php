@@ -126,8 +126,6 @@ class StringCheckTest extends PHPUnit_Framework_TestCase
      */
     public function testCheckThrowsExceptionIfNotADate()
     {
-        $this->markTestIncomplete();
-
         $mockParam = [
             'value' => 'some string',
             'format' => 'date',
@@ -145,10 +143,8 @@ class StringCheckTest extends PHPUnit_Framework_TestCase
 
     public function testCheckContinuesIfDateIsADate()
     {
-        $this->markTestIncomplete();
-
         $mockParam = [
-            'value' => 'some string',
+            'value' => '2016-01-01',
             'format' => 'date',
         ];
 
@@ -168,8 +164,6 @@ class StringCheckTest extends PHPUnit_Framework_TestCase
      */
     public function testCheckThrowsExceptionIfNotADatetime()
     {
-        $this->markTestIncomplete();
-
         $mockParam = [
             'value' => 'some string',
             'format' => 'datetime',
@@ -187,10 +181,8 @@ class StringCheckTest extends PHPUnit_Framework_TestCase
 
     public function testCheckContinuesIfDatetimeIsADatetime()
     {
-        $this->markTestIncomplete();
-
         $mockParam = [
-            'value' => 'some string',
+            'value' => '2016-01-01T04:00:00+00:00',
             'format' => 'datetime',
         ];
 
