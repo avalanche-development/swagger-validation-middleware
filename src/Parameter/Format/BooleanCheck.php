@@ -12,7 +12,10 @@ class BooleanCheck
      */
     public function check(array $param)
     {
-        if ($param['value'] !== 'true' && $param['value'] !== 'false') {
+        if (
+            ($param['value'] !== true && $param['value'] !== 'true') &&
+            ($param['value'] !== false && $param['value'] !== 'false')
+        ) {
             throw new ValidationException('Value is not a boolean');
         }
     }

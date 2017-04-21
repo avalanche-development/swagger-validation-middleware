@@ -56,6 +56,7 @@ class ParameterCheck
         $this->checkRequired($param);
 
         // todo if empty, bail
+        // todo formdata
 
         if ($param['in'] === 'body') {
             $this->checkBodySchema($param);
@@ -84,7 +85,14 @@ class ParameterCheck
      */
     protected function checkBodySchema(array $param)
     {
-        return;
+        // todo is json the only option? also, handle json better
+        $bodyParam = array_merge(
+            $param['schema'],
+            [
+                'value' => json_decode($param['value']),
+            ]
+        );
+        return $this->checkParamValue($bodyParam);
     }
 
     /**
@@ -93,6 +101,8 @@ class ParameterCheck
     protected function checkParamValue(array $param)
     {
         if ($param['type'] === 'array') {
+            // todo check items length
+
             $self = $this;
             return array_walk(
                 $param['value'],
@@ -104,6 +114,28 @@ class ParameterCheck
                         ]
                     );
                     $self->checkParamValue($itemParam);
+                }
+            );
+        }
+
+        if ($param['type'] === 'object') {
+            // todo check required properties
+
+            $self = $this;
+            return array_walk(
+                $param['properties'],
+                function ($schema, $key) use ($self, $param) {
+                    if (!isset($param['value']->{$key})) {
+                        return;
+                    }
+
+                    $propertyParam = array_merge(
+                        $schema,
+                        [
+                            'value' => $param['value']->{$key},
+                        ]
+                    );
+                    $self->checkParamValue($propertyParam);
                 }
             );
         }
