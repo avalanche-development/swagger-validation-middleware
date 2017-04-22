@@ -21,10 +21,20 @@ class BooleanCheckTest extends PHPUnit_Framework_TestCase
         $booleanCheck->check($mockParam);
     }
 
-    public function testCheckContinuesNormallyIfOkay()
+    public function testCheckPassesWithBoolean()
     {
         $mockParam = [
-            'value' => 'false',
+            'value' => false,
+        ];
+
+        $booleanCheck = new BooleanCheck;
+        $booleanCheck->check($mockParam);
+    }
+
+    public function testCheckPassesWithStringBoolean()
+    {
+        $mockParam = [
+            'value' => 'true',
         ];
 
         $booleanCheck = new BooleanCheck;

@@ -85,7 +85,7 @@ class ParameterCheck
      */
     protected function checkBodySchema(array $param)
     {
-        // todo is json the only option? also, handle json better
+        // todo move parsing of body to swagger-router-middleware
         $bodyParam = array_merge(
             $param['schema'],
             [
@@ -148,6 +148,7 @@ class ParameterCheck
      */
     protected function checkFormat(array $param)
     {
+        // todo move this check up to checkParam
         if (strlen($param['value']) < 1) {
             return;
         }
