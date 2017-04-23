@@ -251,6 +251,37 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $reflectedCheckRequired->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
+    public function testCheckBodySchemaPassesAlongRefactoredParams()
+    {
+        $mockParam = [
+            'schema' => [
+                'type' => 'some type',
+            ],
+            'value' => 'some value',
+        ];
+
+        $refactoredParam = [
+            'type' => 'some type',
+            'value' => 'some value',
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckBodySchema = $reflectedParameterCheck->getMethod('checkBodySchema');
+        $reflectedCheckBodySchema->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkParamValue',
+            ])
+            ->getMock();
+        $parameterCheck->expects($this->once())
+            ->method('checkParamValue')
+            ->with($refactoredParam);
+
+        $reflectedCheckBodySchema->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
     public function testCheckParamValueCallsCheckParamValueForEachItemInArray()
     {
         $mockParam = [

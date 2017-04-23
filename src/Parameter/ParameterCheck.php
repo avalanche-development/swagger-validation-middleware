@@ -85,13 +85,13 @@ class ParameterCheck
      */
     protected function checkBodySchema(array $param)
     {
-        // todo move parsing of body to swagger-router-middleware
         $bodyParam = array_merge(
             $param['schema'],
             [
-                'value' => json_decode($param['value']),
+                'value' => $param['value'],
             ]
         );
+
         return $this->checkParamValue($bodyParam);
     }
 
