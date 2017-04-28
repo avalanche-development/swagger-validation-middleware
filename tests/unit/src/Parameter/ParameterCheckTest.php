@@ -303,6 +303,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkFormat',
+                'checkItems',
             ])
             ->getMock();
         $parameterCheck->expects($this->exactly(count($mockParam['value'])))
@@ -335,6 +336,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkFormat',
+                'checkItems',
             ])
             ->getMock();
         $parameterCheck->expects($this->once())
@@ -363,6 +365,7 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods([
                 'checkFormat',
+                'checkItems',
             ])
             ->getMock();
         $parameterCheck->method('checkFormat')

@@ -101,7 +101,7 @@ class ParameterCheck
     protected function checkParamValue(array $param)
     {
         if ($param['type'] === 'array') {
-            // todo check items length
+            $this->checkItems($param);
 
             $self = $this;
             return array_walk(
@@ -141,6 +141,25 @@ class ParameterCheck
         }
 
         $this->checkFormat($param);
+    }
+
+    /**
+     * @param array $param
+     */
+    protected function checkItems(array $param)
+    {
+        if (isset($param['maxItems']) && $param['maxItems'] < count($param['value'])) {
+            throw new ValidationException('Size of array exceeds maxItems');
+        }
+        if (isset($param['minItems']) && $param['minItems'] > count($param['value'])) {
+            throw new ValidationException('Size of array exceeds minItems');
+        }
+        if (isset($param['uniqueItems']) && $param['uniqueItems'] == true) {
+            $uniqueValues = array_unique($param['value']);
+            if (count($uniqueValues < count($param['value']))) {
+                throw new ValidationException('Duplicate array items found when should be unique');
+            }
+        }
     }
 
     /**
