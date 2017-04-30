@@ -156,7 +156,7 @@ class ParameterCheck
         }
         if (isset($param['uniqueItems']) && $param['uniqueItems'] == true) {
             $uniqueValues = array_unique($param['value']);
-            if (count($uniqueValues < count($param['value']))) {
+            if (count($uniqueValues) < count($param['value'])) {
                 throw new ValidationException('Duplicate array items found when should be unique');
             }
         }

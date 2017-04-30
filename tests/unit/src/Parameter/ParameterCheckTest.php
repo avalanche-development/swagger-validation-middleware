@@ -322,6 +322,36 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
+    public function testCheckParamValueChecksItemsIfArray()
+    {
+        $mockParam = [
+            'type' => 'array',
+            'items' => [
+                'type' => 'string',
+            ],
+            'value' => [
+                'some value',
+            ],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckParamValue = $reflectedParameterCheck->getMethod('checkParamValue');
+        $reflectedCheckParamValue->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkFormat',
+                'checkItems',
+            ])
+            ->getMock();
+        $parameterCheck->expects($this->once())
+            ->method('checkItems')
+            ->with($mockParam);
+
+        $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
     public function testCheckParamValueChecksFormatIfNotArray()
     {
         $mockParam = [
@@ -372,6 +402,139 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->will($this->throwException($mockException));
 
         $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckItemsPassesIfMaxItemsIsRespected()
+    {
+        $mockParam = [
+            'maxItems' => 1,
+            'value' => [
+                'value one',
+            ],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckItems = $reflectedParameterCheck->getMethod('checkItems');
+        $reflectedCheckItems->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedCheckItems->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    /**
+     * @expectedException AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\ValidationException
+     * @expectedExceptionMessage Size of array exceeds maxItems
+     */
+    public function testCheckItemsBailsIfMaxItemsIsViolated()
+    {
+        $mockParam = [
+            'maxItems' => 1,
+            'value' => [
+                'value one',
+                'value two',
+            ],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckItems = $reflectedParameterCheck->getMethod('checkItems');
+        $reflectedCheckItems->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedCheckItems->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckItemsPassesIfMinItemsIsRespected()
+    {
+        $mockParam = [
+            'minItems' => 1,
+            'value' => [
+                'value one',
+            ],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckItems = $reflectedParameterCheck->getMethod('checkItems');
+        $reflectedCheckItems->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedCheckItems->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    /**
+     * @expectedException AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\ValidationException
+     * @expectedExceptionMessage Size of array exceeds minItems
+     */
+    public function testCheckItemsBailsIfMinItemsIsViolated()
+    {
+        $mockParam = [
+            'minItems' => 1,
+            'value' => [],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckItems = $reflectedParameterCheck->getMethod('checkItems');
+        $reflectedCheckItems->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedCheckItems->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckItemsPassesIfUniqueItemsIsRespected()
+    {
+        $mockParam = [
+            'uniqueItems' => true,
+            'value' => [
+                'value one',
+                'value two',
+            ],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckItems = $reflectedParameterCheck->getMethod('checkItems');
+        $reflectedCheckItems->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedCheckItems->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    /**
+     * @expectedException AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\ValidationException
+     * @expectedExceptionMessage Duplicate array items found when should be unique
+     */
+    public function testCheckItemsBailsIfUniqueItemsIsViolated()
+    {
+        $mockParam = [
+            'uniqueItems' => true,
+            'value' => [
+                'some value',
+                'some value',
+            ],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckItems = $reflectedParameterCheck->getMethod('checkItems');
+        $reflectedCheckItems->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedCheckItems->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
     public function testCheckFormatBailsIfValueIsEmpty()
