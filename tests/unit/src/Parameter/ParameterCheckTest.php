@@ -282,46 +282,6 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $reflectedCheckBodySchema->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
-    public function testCheckParamValueCallsCheckParamValueForEachItemInArray()
-    {
-        $mockParam = [
-            'type' => 'array',
-            'items' => [
-                'type' => 'string',
-            ],
-            'value' => [
-                'value one',
-                'value two',
-            ],
-        ];
-
-        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
-        $reflectedCheckParamValue = $reflectedParameterCheck->getMethod('checkParamValue');
-        $reflectedCheckParamValue->setAccessible(true);
-
-        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
-            ->disableOriginalConstructor()
-            ->setMethods([
-                'checkFormat',
-                'checkItems',
-            ])
-            ->getMock();
-        $parameterCheck->expects($this->exactly(count($mockParam['value'])))
-            ->method('checkFormat')
-            ->withConsecutive(
-                $this->equalTo([
-                    'type' => 'string',
-                    'value' => 'value one',
-                ]),
-                $this->equalTo([
-                    'type' => 'string',
-                    'value' => 'value two',
-                ])
-            );
-
-        $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
-    }
-
     public function testCheckParamValueChecksItemsIfArray()
     {
         $mockParam = [
@@ -352,7 +312,161 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
         $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
-    public function testCheckParamValueChecksFormatIfNotArray()
+    public function testCheckParamValueCallsCheckParamValueForEachItemInArray()
+    {
+        $mockParam = [
+            'type' => 'array',
+            'items' => [
+                'type' => 'string',
+            ],
+            'value' => [
+                'value one',
+                'value two',
+            ],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckParamValue = $reflectedParameterCheck->getMethod('checkParamValue');
+        $reflectedCheckParamValue->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkFormat',
+                'checkItems',
+            ])
+            ->getMock();
+        $parameterCheck->expects($this->exactly(count($mockParam['value'])))
+            ->method('checkFormat')
+            ->withConsecutive(
+                [
+                    $this->equalTo([
+                        'type' => 'string',
+                        'value' => 'value one',
+                    ]),
+                ],
+                [
+                    $this->equalTo([
+                        'type' => 'string',
+                        'value' => 'value two',
+                    ]),
+                ]
+            );
+
+        $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckParamValueChecksRequiredPropertiesIfObject()
+    {
+        $mockParam = [
+            'type' => 'object',
+            'properties' => [
+                'key' => [
+                    'type' => 'string',
+                ],
+            ],
+            'value' => [
+                'key' => 'some value',
+            ],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckParamValue = $reflectedParameterCheck->getMethod('checkParamValue');
+        $reflectedCheckParamValue->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkFormat',
+                'checkRequiredProperties',
+            ])
+            ->getMock();
+        $parameterCheck->expects($this->once())
+            ->method('checkRequiredProperties')
+            ->with($mockParam);
+
+        $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckParamValueCallsCheckParamValueForEachItemInObject()
+    {
+        $mockParam = [
+            'type' => 'object',
+            'properties' => [
+                'key_one' => [
+                    'type' => 'string',
+                ],
+                'key_two' => [
+                    'type' => 'string',
+                ],
+            ],
+            'value' => [
+                'key_one' => 'value one',
+                'key_two' => 'value two',
+            ],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckParamValue = $reflectedParameterCheck->getMethod('checkParamValue');
+        $reflectedCheckParamValue->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkFormat',
+                'checkRequiredProperties',
+            ])
+            ->getMock();
+        $parameterCheck->expects($this->exactly(count($mockParam['value'])))
+            ->method('checkFormat')
+            ->withConsecutive(
+                [
+                    $this->equalTo([
+                        'type' => 'string',
+                        'value' => 'value one',
+                    ]),
+                ],
+                [
+                    $this->equalTo([
+                        'type' => 'string',
+                        'value' => 'value two',
+                    ]),
+                ]
+            );
+
+        $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckParamValueSkipsEmptyProperties()
+    {
+        $mockParam = [
+            'type' => 'object',
+            'properties' => [
+                'key' => [
+                    'type' => 'string',
+                ],
+            ],
+            'value' => [],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckParamValue = $reflectedParameterCheck->getMethod('checkParamValue');
+        $reflectedCheckParamValue->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'checkFormat',
+                'checkRequiredProperties',
+            ])
+            ->getMock();
+        $parameterCheck->expects($this->never())
+            ->method('checkFormat');
+
+        $reflectedCheckParamValue->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckParamValueChecksFormatIfNotArrayOrObject()
     {
         $mockParam = [
             'type' => 'boolean',
@@ -535,6 +649,84 @@ class ParameterCheckTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $reflectedCheckItems->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckRequiredPropertiesPassesIfNoPropertiesSet()
+    {
+        $mockParam = [
+            'properties' => [
+                'key' => [
+                    'type' => 'string',
+                ],
+            ],
+            'value' => [],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckRequiredProperties = $reflectedParameterCheck->getMethod('checkRequiredProperties');
+        $reflectedCheckRequiredProperties->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedCheckRequiredProperties->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    /**
+     * @expectedException AvalancheDevelopment\SwaggerValidationMiddleware\Parameter\ValidationException
+     * @expectedExceptionMessage Required value was not set
+     */
+    public function testCheckRequiredPropertiesBailsIfRequiredPropertyNotSet()
+    {
+        $mockParam = [
+            'required' => [
+                'key',
+            ],
+            'properties' => [
+                'key' => [
+                    'type' => 'string',
+                ],
+            ],
+            'value' => [],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckRequiredProperties = $reflectedParameterCheck->getMethod('checkRequiredProperties');
+        $reflectedCheckRequiredProperties->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedCheckRequiredProperties->invokeArgs($parameterCheck, [ $mockParam ]);
+    }
+
+    public function testCheckRequiredPropertiesPassesIfRequiredPropertiesAreMet()
+    {
+        $mockParam = [
+            'required' => [
+                'key',
+            ],
+            'properties' => [
+                'key' => [
+                    'type' => 'string',
+                ],
+            ],
+            'value' => [
+                'key' => 'some value',
+            ],
+        ];
+
+        $reflectedParameterCheck = new ReflectionClass(ParameterCheck::class);
+        $reflectedCheckRequiredProperties = $reflectedParameterCheck->getMethod('checkRequiredProperties');
+        $reflectedCheckRequiredProperties->setAccessible(true);
+
+        $parameterCheck = $this->getMockBuilder(ParameterCheck::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectedCheckRequiredProperties->invokeArgs($parameterCheck, [ $mockParam ]);
     }
 
     public function testCheckFormatBailsIfValueIsEmpty()

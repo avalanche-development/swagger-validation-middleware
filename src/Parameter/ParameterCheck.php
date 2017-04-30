@@ -119,20 +119,20 @@ class ParameterCheck
         }
 
         if ($param['type'] === 'object') {
-            // todo check required properties
+            $this->checkRequiredProperties($param);
 
             $self = $this;
             return array_walk(
                 $param['properties'],
                 function ($schema, $key) use ($self, $param) {
-                    if (!isset($param['value']->{$key})) {
+                    if (!isset($param['value'][$key])) {
                         return;
                     }
 
                     $propertyParam = array_merge(
                         $schema,
                         [
-                            'value' => $param['value']->{$key},
+                            'value' => $param['value'][$key],
                         ]
                     );
                     $self->checkParamValue($propertyParam);
@@ -159,6 +159,26 @@ class ParameterCheck
             if (count($uniqueValues) < count($param['value'])) {
                 throw new ValidationException('Duplicate array items found when should be unique');
             }
+        }
+    }
+
+    /**
+     * @param array $param
+     */
+    protected function checkRequiredProperties(array $param)
+    {
+        $requiredProperties = [];
+        if (array_key_exists('required', $param)) {
+            $requiredProperties = $param['required'];
+        }
+
+        $properties = array_keys($param['value']);
+        foreach($requiredProperties as $requiredProperty) {
+            if (in_array($requiredProperty, $properties)) {
+                continue;
+            }
+
+            throw new ValidationException('Required value was not set');
         }
     }
 
